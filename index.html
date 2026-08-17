@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#080808"/>
+<title>YEIL Business Management</title>
+<style>
+:root{
+  --bg:#080808;--panel:#111;--panel2:#171717;--line:#2a2418;
+  --gold:#d7b464;--gold2:#f0d58b;--text:#f7f4ed;--muted:#a9a49a;
+  --danger:#d06a6a;--ok:#71b48d;--warn:#d6a85d;--shadow:0 16px 42px rgba(0,0,0,.34)
+}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#050505,#0d0b08 42%,#070707);color:var(--text);font-family:Pretendard,"Noto Sans KR",system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+#loginView{min-height:100vh;display:grid;place-items:center;padding:24px}
+.login-card{width:min(440px,100%);background:rgba(17,17,17,.95);border:1px solid #342d1e;border-radius:24px;padding:28px;box-shadow:var(--shadow)}
+.logo{display:flex;justify-content:center;margin-bottom:18px}
+.logo img{width:180px;max-height:120px;object-fit:contain;border-radius:14px}
+.brand-text{text-align:center;margin-bottom:24px}.brand-text h1{letter-spacing:.26em;margin:0;color:var(--gold2);font-size:24px}.brand-text p{color:var(--muted);font-size:12px;letter-spacing:.12em}
+label{display:block;font-size:12px;color:#c9c2b3;margin:0 0 7px}
+.field{margin-bottom:14px}
+input,select,textarea{width:100%;background:#0d0d0d;color:#fff;border:1px solid #383125;border-radius:12px;padding:12px 13px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+textarea{min-height:80px;resize:vertical}
+.btn{border:1px solid #4a3d24;background:#19150e;color:var(--gold2);padding:11px 14px;border-radius:12px;font-weight:700}
+.btn.primary{background:linear-gradient(135deg,#b8913f,#e1c477);color:#0b0905;border:none}
+.btn.ghost{background:#111;color:#ddd;border-color:#303030}.btn.danger{border-color:#5a2828;color:#f2a3a3;background:#1c1010}.btn.ok{border-color:#244934;color:#99d4b1;background:#0e1812}
+.login-help{margin-top:16px;padding:12px;border-radius:12px;background:#0a0a0a;border:1px dashed #3b3427;color:#9d988e;font-size:12px;line-height:1.65}
+#appView{min-height:100vh}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:250px;background:#090909;border-right:1px solid #2e281d;padding:20px 14px;z-index:5;overflow:auto}
+.side-brand{display:flex;align-items:center;gap:10px;padding:5px 8px 18px;border-bottom:1px solid #242018}
+.side-brand img{width:54px;height:54px;border-radius:10px;object-fit:cover}
+.side-brand strong{color:var(--gold2);letter-spacing:.12em}.side-brand small{display:block;color:#777;margin-top:3px}
+.nav{display:grid;gap:7px;margin-top:16px}
+.nav button{border:0;background:transparent;color:#bbb;text-align:left;padding:12px;border-radius:11px}
+.nav button.active,.nav button:hover{background:linear-gradient(90deg,#2a2214,#15120d);color:var(--gold2)}
+.main{margin-left:250px;padding:24px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+.topbar h2{margin:0;font-size:24px}.topbar .meta{color:#9f998e;font-size:13px}
+.user-chip{border:1px solid #393020;background:#10100f;border-radius:999px;padding:9px 13px;color:#d9caa8;font-size:13px}
+.grid{display:grid;gap:14px}.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:linear-gradient(180deg,#131313,#0d0d0d);border:1px solid #2d271c;border-radius:18px;padding:18px;box-shadow:0 10px 28px rgba(0,0,0,.18)}
+.card h3{margin:0 0 12px;font-size:15px;color:#ece7dc}.kpi .label{font-size:12px;color:#8f8a81}.kpi .value{font-size:24px;margin-top:7px;font-weight:800;color:var(--gold2)}.kpi .sub{font-size:11px;color:#777;margin-top:5px}
+.two{grid-template-columns:1.2fr .8fr}.three{grid-template-columns:repeat(3,1fr)}
+.section{display:none}.section.active{display:block}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 14px}.section-title h3{margin:0;font-size:18px}
+.table-wrap{overflow:auto;border:1px solid #29241b;border-radius:14px}
+table{width:100%;border-collapse:collapse;min-width:760px;background:#0c0c0c}
+th,td{padding:11px;border-bottom:1px solid #222;text-align:left;font-size:13px}
+th{color:#d2bd88;background:#12110f;position:sticky;top:0}.money{color:var(--gold2);font-weight:800}
+.badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:11px;border:1px solid #39342b;color:#bbb}.badge.done{color:#9ed7b3;border-color:#294c37}.badge.cancel{color:#e79a9a;border-color:#583030}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.span2{grid-column:span 2}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.quote-lines{display:grid;gap:9px}.quote-line{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:11px;border-radius:12px;background:#0a0a0a;border:1px solid #242018}
+.quote-line small{color:#8f8a81}.summary{display:grid;gap:8px}.summary .row{display:flex;justify-content:space-between;border-bottom:1px dashed #2a251c;padding:9px 0}.summary .total{font-size:19px;color:var(--gold2);font-weight:900}
+.notice{font-size:12px;color:#aaa;background:#0b0b0b;border-left:3px solid var(--gold);padding:10px 12px;border-radius:8px}
+.empty{color:#777;padding:20px;text-align:center}
+.mobile-menu{display:none}
+@media(max-width:980px){
+ .sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}
+ .main{margin-left:0;padding:16px}.mobile-menu{display:inline-flex}
+ .kpis{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+ .kpis{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.span2{grid-column:auto}
+ .topbar h2{font-size:19px}.card{padding:14px}.quote-line{grid-template-columns:1fr auto}
+}
+</style>
+</head>
+<body>
+
+<div id="loginView">
+  <div class="login-card">
+    <div class="logo"><img src="yeil-logo.jpg" alt="YEIL 로고"></div>
+    <div class="brand-text"><h1>YEIL</h1><p>BUSINESS MANAGEMENT SYSTEM</p></div>
+    <div class="field"><label>이메일</label><input id="loginId" type="email" autocomplete="username" placeholder="Supabase에 등록한 이메일"></div>
+    <div class="field"><label>비밀번호</label><input id="loginPw" type="password" autocomplete="current-password" placeholder="비밀번호 입력"></div>
+    <button class="btn primary" style="width:100%" onclick="login()">LOGIN</button>
+    <div class="actions" style="margin-top:10px;justify-content:center">
+      <button class="btn ghost" type="button" onclick="resetPublishableKeyFromLogin()">연결키 다시 설정</button>
+      <button class="btn ghost" type="button" onclick="testCloudConnection()">연결 상태 확인</button>
+    </div>
+    <div id="loginError" style="display:none;margin-top:12px;padding:12px;border:1px solid #5a2828;background:#1c1010;color:#f2a3a3;border-radius:12px;font-size:12px;line-height:1.6;white-space:pre-wrap"></div>
+    <div class="login-help">
+      Supabase에 등록한 본인 이메일과 비밀번호로 로그인하세요.<br>
+      총괄이사 · 대표 · 실장 계정의 직책은 서버에서 자동으로 확인합니다.<br>
+      <span id="configState">클라우드 연결 설정 확인 중...</span>
+    </div>
+  </div>
+</div>
+
+<div id="appView" class="hidden">
+  <aside class="sidebar" id="sidebar">
+    <div class="side-brand"><img src="yeil-logo.jpg"><div><strong>YEIL</strong><small>Management</small></div></div>
+    <div class="nav">
+      <button class="active" data-page="home">🏠 홈</button>
+      <button data-page="reservation">📅 예약관리</button>
+      <button data-page="quote">🧾 견적관리</button>
+      <button data-page="settlement">💰 정산관리</button>
+      <button data-page="partners">🏢 거래처관리</button>
+      <button data-page="sales">📞 영업관리</button>
+      <button data-page="analytics">📊 경영분석</button>
+      <button data-page="prices" class="admin-only">⚙️ 단가관리</button>
+      <button data-page="settings" class="admin-only">👤 계정/설정</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="btn ghost mobile-menu" onclick="toggleMenu()">☰</button>
+        <div><h2 id="pageTitle">홈</h2><div class="meta" id="todayLabel"></div></div>
+      </div>
+      <div class="actions"><span class="user-chip" id="userChip"></span><button class="btn ghost" onclick="logout()">로그아웃</button></div>
+    </div>
+
+    <section id="home" class="section active">
+      <div class="grid kpis">
+        <div class="card kpi"><div class="label">오늘 예약</div><div class="value" id="kToday">0건</div><div class="sub">취소 제외</div></div>
+        <div class="card kpi"><div class="label">이번 달 완료</div><div class="value" id="kDone">0건</div><div class="sub">작업 완료 기준</div></div>
+        <div class="card kpi"><div class="label">이번 달 매출</div><div class="value" id="kSales">0원</div><div class="sub">완료 예약 합계</div></div>
+        <div class="card kpi"><div class="label">미수금</div><div class="value" id="kUnpaid">0원</div><div class="sub">결제대기 건</div></div>
+      </div>
+      <div class="grid two" style="margin-top:14px">
+        <div class="card"><h3>오늘 일정</h3><div id="homeSchedule"></div></div>
+        <div class="card"><h3>오늘 영업관리</h3><div id="homeFollowups"></div></div>
+      </div>
+    </section>
+
+    <section id="reservation" class="section">
+      <div class="section-title"><h3>예약 등록 / 수정</h3><button class="btn ghost" onclick="resetReservationForm()">새 예약</button></div>
+      <div class="card">
+        <input type="hidden" id="rId">
+        <div class="form-grid">
+          <div><label>예약일</label><input id="rDate" type="date"></div>
+          <div><label>시간</label><input id="rTime" type="time"></div>
+          <div><label>고객명</label><input id="rCustomer"></div>
+          <div><label>연락처</label><input id="rPhone"></div>
+          <div class="span2"><label>주소</label><input id="rAddress"></div>
+          <div><label>담당자</label><select id="rAssignee"><option>대표</option><option>총괄이사</option><option>실장</option></select></div>
+          <div><label>상태</label><select id="rStatus"><option>예약접수</option><option>일정확정</option><option>출발</option><option>작업중</option><option>작업완료</option><option>취소</option></select></div>
+          <div><label>고객유형</label><select id="rCustomerType"><option>일반고객</option><option>거래처</option></select></div>
+          <div><label>거래처</label><select id="rPartner"><option value="">없음</option></select></div>
+          <div><label>견적금액</label><input id="rAmount" type="number" min="0"></div>
+          <div><label>결제상태</label><select id="rPayment"><option>미결제</option><option>결제완료</option></select></div>
+          <div class="span2"><label>작업내용</label><input id="rWork" placeholder="예: 양문형 800L 이상 이전"></div>
+          <div class="span2"><label>특이사항</label><textarea id="rMemo"></textarea></div>
+        </div>
+        <div class="actions" style="margin-top:12px"><button class="btn primary" onclick="saveReservation()">저장</button><button class="btn ghost" onclick="resetReservationForm()">초기화</button></div>
+      </div>
+      <div class="section-title" style="margin-top:20px"><h3>예약 목록</h3></div>
+      <div class="table-wrap"><table><thead><tr><th>일정</th><th>고객</th><th>작업</th><th>담당</th><th>상태</th><th>금액</th><th>결제</th><th>관리</th></tr></thead><tbody id="reservationRows"></tbody></table></div>
+    </section>
+
+    <section id="quote" class="section">
+      <div class="grid two">
+        <div class="card">
+          <h3>자동 견적</h3>
+          <div class="form-grid">
+            <div><label>품목</label><select id="qItem" onchange="refreshQuoteOptions()"></select></div>
+            <div><label>세부구분</label><select id="qVariant"></select></div>
+            <div><label>작업</label><select id="qWork"><option>이전</option><option>재설치</option><option>철거</option></select></div>
+            <div><label>수량</label><input id="qQty" type="number" min="1" value="1"></div>
+          </div>
+          <div class="actions" style="margin-top:12px"><button class="btn primary" onclick="addQuoteLine()">품목 추가</button></div>
+          <hr style="border:0;border-top:1px solid #29241c;margin:18px 0">
+          <div class="form-grid">
+            <div><label>추가작업비</label><input id="qExtra" type="number" value="0" oninput="renderQuote()"></div>
+            <div><label>사다리차</label><input id="qLadder" type="number" value="0" oninput="renderQuote()"></div>
+            <div><label>스카이</label><input id="qSky" type="number" value="0" oninput="renderQuote()"></div>
+            <div><label>할인</label><input id="qDiscount" type="number" value="0" oninput="renderQuote()"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>견적 내역</h3>
+          <div id="quoteLines" class="quote-lines"></div>
+          <div class="summary" style="margin-top:14px">
+            <div class="row"><span>품목 합계</span><b id="qSubtotal">0원</b></div>
+            <div class="row"><span>추가비용</span><b id="qExtras">0원</b></div>
+            <div class="row total"><span>최종 견적</span><span id="qTotal">0원</span></div>
+          </div>
+          <div class="actions" style="margin-top:14px"><button class="btn primary" onclick="copyQuote()">견적 복사</button><button class="btn ghost" onclick="useQuoteForReservation()">예약에 적용</button><button class="btn danger" onclick="clearQuote()">전체 삭제</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="settlement" class="section">
+      <div class="grid kpis">
+        <div class="card kpi"><div class="label">완료 매출</div><div class="value" id="sRevenue">0원</div></div>
+        <div class="card kpi"><div class="label">등록 비용</div><div class="value" id="sCost">0원</div></div>
+        <div class="card kpi"><div class="label">예상 이익</div><div class="value" id="sProfit">0원</div></div>
+        <div class="card kpi"><div class="label">미수금</div><div class="value" id="sUnpaid">0원</div></div>
+      </div>
+      <div class="grid two" style="margin-top:14px">
+        <div class="card">
+          <h3>비용 등록</h3>
+          <div class="form-grid">
+            <div><label>날짜</label><input type="date" id="cDate"></div>
+            <div><label>구분</label><select id="cType"><option>사다리/스카이</option><option>외주비</option><option>차량비</option><option>광고비</option><option>소모품</option><option>기타</option></select></div>
+            <div><label>금액</label><input type="number" id="cAmount"></div>
+            <div><label>메모</label><input id="cMemo"></div>
+          </div>
+          <button class="btn primary" style="margin-top:12px" onclick="addCost()">비용 저장</button>
+        </div>
+        <div class="card"><h3>최근 비용</h3><div id="costList"></div></div>
+      </div>
+    </section>
+
+    <section id="partners" class="section">
+      <div class="grid two">
+        <div class="card">
+          <h3>거래처 등록</h3>
+          <input type="hidden" id="pId">
+          <div class="form-grid">
+            <div><label>업체명</label><input id="pName"></div>
+            <div><label>업종</label><select id="pType"><option>이사업체</option><option>중고가전</option><option>인테리어</option><option>부동산/입주</option><option>기타</option></select></div>
+            <div><label>담당자</label><input id="pContact"></div>
+            <div><label>연락처</label><input id="pPhone"></div>
+            <div class="span2"><label>주소/지역</label><input id="pArea"></div>
+            <div><label>상태</label><select id="pStatus"><option>영업대상</option><option>첫 연락</option><option>관심</option><option>단가표 전달</option><option>협의중</option><option>거래중</option><option>휴면</option></select></div>
+            <div><label>다음 연락일</label><input type="date" id="pFollow"></div>
+            <div class="span2"><label>메모</label><textarea id="pMemo"></textarea></div>
+          </div>
+          <div class="actions" style="margin-top:12px"><button class="btn primary" onclick="savePartner()">저장</button><button class="btn ghost" onclick="resetPartner()">초기화</button></div>
+        </div>
+        <div class="card"><h3>거래처 현황</h3><div id="partnerCards"></div></div>
+      </div>
+    </section>
+
+    <section id="sales" class="section">
+      <div class="card"><h3>영업 파이프라인</h3><div id="salesPipeline" class="grid three"></div></div>
+    </section>
+
+    <section id="analytics" class="section">
+      <div class="grid kpis">
+        <div class="card kpi"><div class="label">총 작업건수</div><div class="value" id="aJobs">0건</div></div>
+        <div class="card kpi"><div class="label">평균 작업금액</div><div class="value" id="aAvg">0원</div></div>
+        <div class="card kpi"><div class="label">거래처 작업</div><div class="value" id="aPartnerJobs">0건</div></div>
+        <div class="card kpi"><div class="label">개인고객 작업</div><div class="value" id="aRetailJobs">0건</div></div>
+      </div>
+      <div class="grid two" style="margin-top:14px">
+        <div class="card"><h3>담당자별 완료 건수</h3><div id="assigneeStats"></div></div>
+        <div class="card"><h3>거래처 TOP</h3><div id="partnerStats"></div></div>
+      </div>
+    </section>
+
+    <section id="prices" class="section">
+      <div class="card">
+        <div class="section-title"><h3>YEIL 기본 단가</h3><span class="notice">1차 버전은 확정 단가를 표시합니다. 다음 버전에서 관리자 직접수정 + 거래처별 단가 저장을 연결할 수 있습니다.</span></div>
+        <div class="table-wrap"><table><thead><tr><th>품목</th><th>구분</th><th>이전</th><th>재설치</th><th>철거</th></tr></thead><tbody id="priceRows"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="settings" class="section">
+      <div class="grid two">
+        <div class="card"><h3>계정</h3><div class="notice">Supabase Authentication으로 로그인하며 직책과 권한은 staff_profiles에서 확인합니다.</div><div id="accountList" style="margin-top:12px"></div></div>
+        <div class="card"><h3>클라우드 연결</h3><p style="color:#999;font-size:13px">예약 · 거래처 · 비용 데이터는 Supabase에 저장됩니다.</p><div class="notice">Publishable key는 이 브라우저에만 저장됩니다. Secret key는 절대 입력하지 마세요.</div><div class="field" style="margin-top:12px"><label>Publishable key</label><input id="publishableKeyInput" type="password" placeholder="sb_publishable_..."></div><div class="actions"><button class="btn primary" onclick="saveCloudConfig()">연결키 저장</button><button class="btn ghost" onclick="clearCloudConfig()">연결키 삭제</button></div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const PRICE_ROWS = [
+ ['일반 냉장고','600L까지',70000,40000,35000],
+ ['양문형 냉장고','800L 미만',100000,50000,40000],
+ ['양문형 냉장고','800L 이상',120000,60000,50000],
+ ['양문형 냉장고','900L 이상',140000,70000,60000],
+ ['키친 핏','원도어',70000,40000,35000],
+ ['김치 냉장고','뚜껑형',50000,40000,30000],
+ ['김치 냉장고','스탠드 500 미만',70000,50000,35000],
+ ['김치 냉장고','스탠드 500 이상',100000,60000,40000],
+ ['TV (스탠드)','39인치 이하',50000,30000,20000],
+ ['TV (스탠드)','40~49인치',60000,40000,30000],
+ ['TV (스탠드)','50~59인치',70000,50000,35000],
+ ['TV (스탠드)','60~69인치',100000,60000,40000],
+ ['TV (스탠드)','70~79인치',120000,70000,45000],
+ ['TV (스탠드)','80~89인치',150000,90000,50000],
+ ['TV (벽걸이)','39인치 이하',60000,40000,20000],
+ ['TV (벽걸이)','40~49인치',70000,50000,30000],
+ ['TV (벽걸이)','50~59인치',80000,60000,40000],
+ ['TV (벽걸이)','60~69인치',100000,70000,45000],
+ ['TV (벽걸이)','70~79인치',150000,90000,50000],
+ ['TV (벽걸이)','80~89인치',200000,120000,60000],
+ ['일반 세탁기(통돌이)','기본',70000,40000,30000],
+ ['드럼 세탁기','15KG 미만',70000,40000,30000],
+ ['드럼 세탁기','15KG 이상',100000,60000,50000],
+ ['건조기','14KG 미만 / 1단',70000,50000,40000],
+ ['건조기','14KG 미만 / 2단',100000,60000,50000],
+ ['건조기','14KG 이상 / 1단',100000,60000,40000],
+ ['건조기','14KG 이상 / 2단',120000,70000,50000],
+ ['콤보 세탁기','기본',180000,100000,80000]
+];
+
+const SUPABASE_URL='https://kqhbxtjjnqygvncfdes.supabase.co';
+const KEY_STORE='yeil_supabase_publishable_key';
+let supabaseClient=null;
+let db={reservations:[],partners:[],costs:[],quotes:[]};
+let currentUser=null, quoteLines=[];
+const $=id=>document.getElementById(id);
+const won=n=>(Number(n)||0).toLocaleString('ko-KR')+'원';
+const today=()=>new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Seoul'});
+const month=()=>today().slice(0,7);
+const uid=()=>String(Date.now())+Math.random().toString(36).slice(2,7);
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+function getPublishableKey(){return localStorage.getItem(KEY_STORE)||''}
+function initSupabase(){
+ const key=getPublishableKey();
+ if(!key||!window.supabase){supabaseClient=null;return false}
+ supabaseClient=window.supabase.createClient(SUPABASE_URL,key);return true
+}
+function updateConfigState(){
+ const el=$('configState'); if(el)el.textContent=getPublishableKey()?'클라우드 연결키가 저장되어 있습니다.':'처음 한 번 Publishable key 설정이 필요합니다.';
+ const inp=$('publishableKeyInput');if(inp)inp.value=getPublishableKey();
+}
+function saveCloudConfig(){
+ const key=$('publishableKeyInput').value.trim();
+ if(!key.startsWith('sb_publishable_')){alert('Publishable key(sb_publishable_...)를 입력해주세요. Secret key는 입력하면 안 됩니다.');return}
+ localStorage.setItem(KEY_STORE,key);initSupabase();alert('연결키를 저장했어요. 다시 로그인해주세요.');logout();
+}
+function clearCloudConfig(){if(confirm('이 브라우저에 저장된 Publishable key를 삭제할까요?')){localStorage.removeItem(KEY_STORE);location.reload()}}
+async function login(){
+ const errBox=$('loginError');
+ const showErr=(msg)=>{if(errBox){errBox.style.display='block';errBox.textContent=msg} alert(msg)};
+ if(errBox){errBox.style.display='none';errBox.textContent=''}
+ try{
+   if(!initSupabase()){
+     const key=prompt('Supabase Publishable key를 입력해주세요.\n(sb_publishable_... 로 시작하는 키)');
+     if(!key)return;
+     if(!key.trim().startsWith('sb_publishable_')){showErr('Publishable key 형식을 확인해주세요.');return}
+     localStorage.setItem(KEY_STORE,key.trim());
+     if(!initSupabase()){showErr('Supabase 클라이언트를 시작하지 못했습니다. 인터넷 연결을 확인해주세요.');return}
+   }
+   const email=$('loginId').value.trim();
+   const password=$('loginPw').value;
+   if(!email||!password){showErr('이메일과 비밀번호를 모두 입력해주세요.');return}
+   const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+   if(error){
+     const code=error.code||error.status||'unknown';
+     showErr('Supabase 로그인 오류\\n코드: '+code+'\\n내용: '+error.message+'\\n\\n※ 이메일/비밀번호가 맞다면 이 메시지를 캡처해 보내주세요.');
+     return
+   }
+   if(!data?.user){showErr('로그인은 처리됐지만 사용자 정보를 받지 못했습니다.');return}
+   const {data:profile,error:pe}=await supabaseClient.from('staff_profiles').select('title,role').eq('user_id',data.user.id).single();
+   if(pe||!profile){
+     await supabaseClient.auth.signOut();
+     showErr('로그인은 성공했지만 YEIL 직책 정보를 찾지 못했습니다.\\n'+(pe?.message||'staff_profiles 확인 필요'));
+     return
+   }
+   currentUser={id:data.user.id,email:data.user.email,name:profile.title,role:profile.role};
+   await showApp()
+ }catch(e){
+   showErr('연결 중 오류가 발생했습니다.\\n'+(e?.message||String(e))+'\\n\\n인터넷 연결 또는 Publishable key를 확인해주세요.');
+ }
+}
+
+function resetPublishableKeyFromLogin(){
+ const current=getPublishableKey();
+ const key=prompt('Publishable key를 다시 입력해주세요.\\nSecret key가 아니라 sb_publishable_... 로 시작하는 값입니다.', current);
+ if(key===null)return;
+ const clean=key.trim();
+ if(!clean.startsWith('sb_publishable_')){alert('Publishable key 형식을 확인해주세요.');return}
+ localStorage.setItem(KEY_STORE,clean);
+ initSupabase();
+ alert('연결키를 다시 저장했어요. 이제 로그인을 다시 시도해주세요.');
+}
+async function testCloudConnection(){
+ const box=$('loginError');
+ const show=(msg,ok=false)=>{
+   if(box){box.style.display='block';box.style.borderColor=ok?'#244934':'#5a2828';box.style.background=ok?'#0e1812':'#1c1010';box.style.color=ok?'#99d4b1':'#f2a3a3';box.textContent=msg}
+ };
+ try{
+   if(!initSupabase()){show('Publishable key가 없거나 Supabase 라이브러리를 불러오지 못했습니다.\\n「연결키 다시 설정」을 눌러 키를 확인해주세요.');return}
+   const {error}=await supabaseClient.auth.getSession();
+   if(error){show('Supabase 연결 오류\\n'+(error.code||error.status||'unknown')+': '+error.message);return}
+   show('Supabase 프로젝트 연결은 정상입니다.\\n이제 이메일/비밀번호 로그인만 확인하면 됩니다.',true)
+ }catch(e){show('연결 테스트 실패\\n'+(e?.message||String(e)))}
+}
+async function logout(){if(supabaseClient)await supabaseClient.auth.signOut();location.reload()}
+async function loadCloudData(){
+ const [rr,pp,cc]=await Promise.all([
+  supabaseClient.from('reservations').select('*').order('date',{ascending:false}),
+  supabaseClient.from('partners').select('*').order('created_at',{ascending:false}),
+  supabaseClient.from('costs').select('*').order('date',{ascending:false})
+ ]);
+ const err=rr.error||pp.error||cc.error;if(err){alert('클라우드 데이터를 불러오지 못했습니다: '+err.message);return}
+ db.reservations=(rr.data||[]).map(r=>({...r,customerType:r.customer_type,partnerId:r.partner_id}));
+ db.partners=pp.data||[];db.costs=cc.data||[];renderAll();
+}
+let realtimeChannel=null;
+function subscribeRealtime(){
+ if(!supabaseClient)return;
+ realtimeChannel=supabaseClient.channel('yeil-live')
+  .on('postgres_changes',{event:'*',schema:'public',table:'reservations'},loadCloudData)
+  .on('postgres_changes',{event:'*',schema:'public',table:'partners'},loadCloudData)
+  .on('postgres_changes',{event:'*',schema:'public',table:'costs'},loadCloudData)
+  .subscribe();
+}
+async function persist(){await loadCloudData()}
+function showApp(){
+ $('loginView').classList.add('hidden');$('appView').classList.remove('hidden');
+ $('userChip').textContent=currentUser.name;
+ document.querySelectorAll('.admin-only').forEach(el=>el.style.display=currentUser.role==='admin'?'':'none');
+ $('todayLabel').textContent=new Intl.DateTimeFormat('ko-KR',{dateStyle:'full',timeZone:'Asia/Seoul'}).format(new Date());
+ initForms();renderAll();updateConfigState()
+}
+function toggleMenu(){$('sidebar').classList.toggle('open')}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>{
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+ document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));$(b.dataset.page).classList.add('active');
+ $('pageTitle').textContent=b.textContent.replace(/^[^ ]+ /,'');$('sidebar').classList.remove('open');renderAll()
+}));
+function initForms(){
+ $('rDate').value=today();$('cDate').value=today();
+ refreshQuoteOptions(); renderPrices();
+}
+function renderAll(){renderHome();renderReservations();renderSettlement();renderPartners();renderAnalytics();renderPrices();renderAccounts();refreshPartnerSelect()}
+function renderHome(){
+ const t=today(),m=month();
+ const valid=db.reservations.filter(r=>r.status!=='취소');
+ const mt=valid.filter(r=>r.date.startsWith(m));
+ const done=mt.filter(r=>r.status==='작업완료');
+ $('kToday').textContent=valid.filter(r=>r.date===t).length+'건';
+ $('kDone').textContent=done.length+'건';
+ $('kSales').textContent=won(done.reduce((s,r)=>s+Number(r.amount||0),0));
+ $('kUnpaid').textContent=won(mt.filter(r=>r.payment!=='결제완료').reduce((s,r)=>s+Number(r.amount||0),0));
+ const todays=valid.filter(r=>r.date===t).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+ $('homeSchedule').innerHTML=todays.length?todays.map(r=>`<div class="quote-line"><div><b>${esc(r.time||'시간미정')} · ${esc(r.customer)}</b><br><small>${esc(r.work||'-')} · ${esc(r.assignee)}</small></div><span class="money">${won(r.amount)}</span></div>`).join(''):'<div class="empty">오늘 예약이 없어요.</div>';
+ const follows=db.partners.filter(p=>p.follow===t);
+ $('homeFollowups').innerHTML=follows.length?follows.map(p=>`<div class="quote-line"><div><b>${esc(p.name)}</b><br><small>${esc(p.status)} · ${esc(p.phone||'')}</small></div><span>📞</span></div>`).join(''):'<div class="empty">오늘 재연락 일정이 없어요.</div>';
+}
+function resetReservationForm(){
+ ['rId','rTime','rCustomer','rPhone','rAddress','rWork','rMemo'].forEach(id=>$(id).value='');
+ $('rDate').value=today();$('rAssignee').value=currentUser?.name==='실장'?'실장':'대표';$('rStatus').value='예약접수';$('rCustomerType').value='일반고객';$('rPartner').value='';$('rAmount').value='';$('rPayment').value='미결제'
+}
+async function saveReservation(){
+ if(!$('rDate').value||!$('rCustomer').value.trim()){alert('예약일과 고객명을 입력해주세요.');return}
+ const id=$('rId').value;
+ const row={date:$('rDate').value,time:$('rTime').value||null,customer:$('rCustomer').value.trim(),phone:$('rPhone').value.trim(),address:$('rAddress').value.trim(),assignee:$('rAssignee').value,status:$('rStatus').value,customer_type:$('rCustomerType').value,partner_id:$('rPartner').value?Number($('rPartner').value):null,amount:Number($('rAmount').value)||0,payment:$('rPayment').value,work:$('rWork').value.trim(),memo:$('rMemo').value.trim()};
+ const q=id?supabaseClient.from('reservations').update(row).eq('id',Number(id)):supabaseClient.from('reservations').insert(row);
+ const {error}=await q;if(error){alert('저장 실패: '+error.message);return}await loadCloudData();resetReservationForm();alert('저장했어요.')
+}
+function editReservation(id){
+ const r=db.reservations.find(x=>x.id===id);if(!r)return;
+ Object.entries({rId:r.id,rDate:r.date,rTime:r.time,rCustomer:r.customer,rPhone:r.phone,rAddress:r.address,rAssignee:r.assignee,rStatus:r.status,rCustomerType:r.customerType,rPartner:r.partnerId||'',rAmount:r.amount,rPayment:r.payment,rWork:r.work,rMemo:r.memo}).forEach(([k,v])=>$(k).value=v??'');
+ window.scrollTo({top:0,behavior:'smooth'})
+}
+async function deleteReservation(id){if(confirm('이 예약을 삭제할까요?')){const {error}=await supabaseClient.from('reservations').delete().eq('id',Number(id));if(error)alert('삭제 실패: '+error.message);else await loadCloudData()}}
+function renderReservations(){
+ let arr=[...db.reservations].sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
+ if(currentUser?.role==='field') arr=arr.filter(r=>r.assignee==='실장');
+ $('reservationRows').innerHTML=arr.length?arr.map(r=>`<tr><td>${esc(r.date)} ${esc(r.time||'')}</td><td><b>${esc(r.customer)}</b><br><small>${esc(r.phone||'')}</small></td><td>${esc(r.work||'-')}</td><td>${esc(r.assignee)}</td><td><span class="badge ${r.status==='작업완료'?'done':r.status==='취소'?'cancel':''}">${esc(r.status)}</span></td><td class="money">${won(r.amount)}</td><td>${esc(r.payment)}</td><td><div class="actions"><button class="btn ghost" onclick="editReservation('${r.id}')">수정</button><button class="btn danger admin-only" onclick="deleteReservation('${r.id}')">삭제</button></div></td></tr>`).join(''):'<tr><td colspan="8" class="empty">등록된 예약이 없어요.</td></tr>';
+ if(currentUser?.role!=='admin')document.querySelectorAll('#reservationRows .admin-only').forEach(x=>x.style.display='none')
+}
+function refreshQuoteOptions(){
+ const items=[...new Set(PRICE_ROWS.map(r=>r[0]))];
+ $('qItem').innerHTML=items.map(x=>`<option>${esc(x)}</option>`).join('');
+ const updateVariants=()=>{const item=$('qItem').value;$('qVariant').innerHTML=PRICE_ROWS.filter(r=>r[0]===item).map(r=>`<option>${esc(r[1])}</option>`).join('')};
+ $('qItem').onchange=updateVariants;updateVariants()
+}
+function addQuoteLine(){
+ const item=$('qItem').value,v=$('qVariant').value,w=$('qWork').value,qty=Math.max(1,Number($('qQty').value)||1);
+ const row=PRICE_ROWS.find(r=>r[0]===item&&r[1]===v);if(!row)return;
+ const idx={이전:2,재설치:3,철거:4}[w],unit=row[idx];
+ quoteLines.push({id:uid(),item,variant:v,work:w,qty,unit,total:unit*qty});renderQuote()
+}
+function renderQuote(){
+ $('quoteLines').innerHTML=quoteLines.length?quoteLines.map(x=>`<div class="quote-line"><div><b>${esc(x.item)} · ${esc(x.variant)}</b><br><small>${esc(x.work)} × ${x.qty}</small></div><span class="money">${won(x.total)}</span><button class="btn danger" onclick="removeQuoteLine('${x.id}')">삭제</button></div>`).join(''):'<div class="empty">품목을 추가해주세요.</div>';
+ const sub=quoteLines.reduce((s,x)=>s+x.total,0),extra=Number($('qExtra').value)||0,lad=Number($('qLadder').value)||0,sky=Number($('qSky').value)||0,disc=Number($('qDiscount').value)||0;
+ $('qSubtotal').textContent=won(sub);$('qExtras').textContent=won(extra+lad+sky-disc);$('qTotal').textContent=won(Math.max(0,sub+extra+lad+sky-disc))
+}
+function removeQuoteLine(id){quoteLines=quoteLines.filter(x=>x.id!==id);renderQuote()}
+function clearQuote(){quoteLines=[];['qExtra','qLadder','qSky','qDiscount'].forEach(x=>$(x).value=0);renderQuote()}
+function quoteTotal(){
+ const sub=quoteLines.reduce((s,x)=>s+x.total,0);return Math.max(0,sub+(Number($('qExtra').value)||0)+(Number($('qLadder').value)||0)+(Number($('qSky').value)||0)-(Number($('qDiscount').value)||0))
+}
+function copyQuote(){
+ const lines=quoteLines.map(x=>`${x.item} ${x.variant} / ${x.work} x${x.qty} : ${won(x.total)}`).join('\n');
+ const txt=`[YEIL 견적안내]\n${lines}\n추가작업: ${won($('qExtra').value)}\n사다리: ${won($('qLadder').value)}\n스카이: ${won($('qSky').value)}\n할인: -${won($('qDiscount').value)}\n\n최종 견적: ${won(quoteTotal())}`;
+ navigator.clipboard?.writeText(txt).then(()=>alert('견적 내용을 복사했어요.')).catch(()=>prompt('아래 내용을 복사해주세요.',txt))
+}
+function useQuoteForReservation(){
+ $('rAmount').value=quoteTotal();$('rWork').value=quoteLines.map(x=>`${x.item} ${x.variant} ${x.work}`).join(' / ');
+ document.querySelector('[data-page="reservation"]').click()
+}
+async function addCost(){
+ if(!$('cDate').value||!Number($('cAmount').value)){alert('날짜와 금액을 입력해주세요.');return}
+ const {error}=await supabaseClient.from('costs').insert({date:$('cDate').value,type:$('cType').value,amount:Number($('cAmount').value),memo:$('cMemo').value.trim()});
+ if(error){alert('비용 저장 실패: '+error.message);return}$('cAmount').value='';$('cMemo').value='';await loadCloudData()
+}
+async function deleteCost(id){if(confirm('비용 내역을 삭제할까요?')){const {error}=await supabaseClient.from('costs').delete().eq('id',Number(id));if(error)alert('삭제 실패: '+error.message);else await loadCloudData()}}
+function renderSettlement(){
+ const m=month(),done=db.reservations.filter(r=>r.status==='작업완료'&&r.date.startsWith(m)),revenue=done.reduce((s,r)=>s+Number(r.amount||0),0),costs=db.costs.filter(c=>c.date.startsWith(m)),cost=costs.reduce((s,c)=>s+Number(c.amount||0),0),unpaid=done.filter(r=>r.payment!=='결제완료').reduce((s,r)=>s+Number(r.amount||0),0);
+ $('sRevenue').textContent=won(revenue);$('sCost').textContent=won(cost);$('sProfit').textContent=won(revenue-cost);$('sUnpaid').textContent=won(unpaid);
+ $('costList').innerHTML=costs.length?[...costs].reverse().slice(0,10).map(c=>`<div class="quote-line"><div><b>${esc(c.type)}</b><br><small>${esc(c.date)} · ${esc(c.memo||'')}</small></div><span class="money">${won(c.amount)}</span><button class="btn danger" onclick="deleteCost('${c.id}')">삭제</button></div>`).join(''):'<div class="empty">등록된 비용이 없어요.</div>'
+}
+function resetPartner(){['pId','pName','pContact','pPhone','pArea','pMemo','pFollow'].forEach(id=>$(id).value='');$('pType').value='이사업체';$('pStatus').value='영업대상'}
+async function savePartner(){
+ if(!$('pName').value.trim()){alert('업체명을 입력해주세요.');return}
+ const id=$('pId').value,row={name:$('pName').value.trim(),type:$('pType').value,contact:$('pContact').value.trim(),phone:$('pPhone').value.trim(),area:$('pArea').value.trim(),status:$('pStatus').value,follow:$('pFollow').value||null,memo:$('pMemo').value.trim()};
+ const q=id?supabaseClient.from('partners').update(row).eq('id',Number(id)):supabaseClient.from('partners').insert(row);
+ const {error}=await q;if(error){alert('거래처 저장 실패: '+error.message);return}await loadCloudData();resetPartner()
+}
+function editPartner(id){const p=db.partners.find(x=>x.id===id);if(!p)return;Object.entries({pId:p.id,pName:p.name,pType:p.type,pContact:p.contact,pPhone:p.phone,pArea:p.area,pStatus:p.status,pFollow:p.follow,pMemo:p.memo}).forEach(([k,v])=>$(k).value=v??'')}
+async function deletePartner(id){if(confirm('거래처를 삭제할까요?')){const {error}=await supabaseClient.from('partners').delete().eq('id',Number(id));if(error)alert('삭제 실패: '+error.message);else await loadCloudData()}}
+function renderPartners(){
+ $('partnerCards').innerHTML=db.partners.length?db.partners.map(p=>`<div class="quote-line"><div><b>${esc(p.name)}</b><br><small>${esc(p.type)} · ${esc(p.status)} · 다음연락 ${esc(p.follow||'-')}</small></div><div class="actions"><button class="btn ghost" onclick="editPartner('${p.id}')">수정</button><button class="btn danger" onclick="deletePartner('${p.id}')">삭제</button></div></div>`).join(''):'<div class="empty">등록된 거래처가 없어요.</div>';
+ const stages=['영업대상','첫 연락','관심','단가표 전달','협의중','거래중','휴면'];
+ $('salesPipeline').innerHTML=stages.map(s=>`<div class="card"><h3>${s}</h3>${db.partners.filter(p=>p.status===s).map(p=>`<div style="padding:7px 0;border-bottom:1px solid #222"><b>${esc(p.name)}</b><br><small style="color:#888">${esc(p.phone||'')}</small></div>`).join('')||'<div class="empty">0곳</div>'}</div>`).join('')
+}
+function refreshPartnerSelect(){const cur=$('rPartner')?.value||'';$('rPartner').innerHTML='<option value="">없음</option>'+db.partners.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');$('rPartner').value=cur}
+function renderAnalytics(){
+ const m=month(),done=db.reservations.filter(r=>r.status==='작업완료'&&r.date.startsWith(m)),sum=done.reduce((s,r)=>s+Number(r.amount||0),0);
+ $('aJobs').textContent=done.length+'건';$('aAvg').textContent=won(done.length?Math.round(sum/done.length):0);$('aPartnerJobs').textContent=done.filter(r=>r.customerType==='거래처').length+'건';$('aRetailJobs').textContent=done.filter(r=>r.customerType!=='거래처').length+'건';
+ const people=['대표','총괄이사','실장'];$('assigneeStats').innerHTML=people.map(n=>`<div class="summary row"><span>${n}</span><b>${done.filter(r=>r.assignee===n).length}건</b></div>`).join('');
+ const ps=db.partners.map(p=>({name:p.name,count:done.filter(r=>r.partnerId===p.id).length,sales:done.filter(r=>r.partnerId===p.id).reduce((s,r)=>s+Number(r.amount||0),0)})).sort((a,b)=>b.sales-a.sales).slice(0,5);
+ $('partnerStats').innerHTML=ps.length?ps.map(p=>`<div class="summary row"><span>${esc(p.name)} (${p.count}건)</span><b class="money">${won(p.sales)}</b></div>`).join(''):'<div class="empty">거래처 실적이 없어요.</div>'
+}
+function renderPrices(){$('priceRows').innerHTML=PRICE_ROWS.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td class="money">${won(r[2])}</td><td class="money">${won(r[3])}</td><td class="money">${won(r[4])}</td></tr>`).join('')}
+function renderAccounts(){$('accountList').innerHTML=currentUser?`<div class="quote-line"><div><b>${esc(currentUser.name)}</b><br><small>${esc(currentUser.email||'')}</small></div><span class="badge">${currentUser.role==='admin'?'관리자':'현장'}</span></div>`:''}
+async function restoreSession(){
+ updateConfigState();if(!initSupabase())return;
+ const {data}=await supabaseClient.auth.getSession();const user=data.session?.user;if(!user)return;
+ const {data:profile}=await supabaseClient.from('staff_profiles').select('title,role').eq('user_id',user.id).single();
+ if(!profile)return;currentUser={id:user.id,email:user.email,name:profile.title,role:profile.role};await loadCloudData();showApp();subscribeRealtime();
+}
+restoreSession();
+</script>
+</body>
+</html>
