@@ -87,7 +87,7 @@ th{color:#d2bd88;background:#12110f;position:sticky;top:0}.money{color:var(--gol
     <div class="login-help">
       Supabase에 등록한 본인 이메일과 비밀번호로 로그인하세요.<br>
       총괄이사 · 대표 · 실장 계정의 직책은 서버에서 자동으로 확인합니다.<br>
-      <span id="configState">클라우드 연결 설정 확인 중...</span>
+      <span id="configState">v2.3 · Supabase 연결 설정 확인 중...</span>
     </div>
   </div>
 </div>
@@ -263,7 +263,7 @@ th{color:#d2bd88;background:#12110f;position:sticky;top:0}.money{color:var(--gol
   </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
 <script>
 const PRICE_ROWS = [
  ['일반 냉장고','600L까지',70000,40000,35000],
@@ -334,10 +334,40 @@ function saveCloudConfig(url,key){
   localStorage.setItem(URL_STORE,u);
   localStorage.setItem(KEY_STORE,k);
   supabaseClient=null; activeCloudSignature='';
-  return initSupabase();
+  updateConfigState();
+  return true;
 }
 
-function resetCloudConfigFromLogin(){
+async function directConnectionCheck(showAlert=true){
+  const url=getProjectUrl(), key=getPublishableKey();
+  if(!url || !key){
+    const msg='Supabase Project URL 또는 Publishable key가 없습니다.';
+    if(showAlert) alert(msg);
+    return {ok:false,msg};
+  }
+  try{
+    const response=await fetch(url+'/auth/v1/settings',{
+      method:'GET',
+      headers:{apikey:key}
+    });
+    if(response.ok){
+      const msg='Supabase 서버 연결이 정상입니다.';
+      if(showAlert) alert(msg);
+      return {ok:true,msg};
+    }
+    const body=await response.text();
+    const msg='Supabase 서버 응답 오류: HTTP '+response.status+'\n'+body.slice(0,250);
+    if(showAlert) alert(msg);
+    return {ok:false,msg};
+  }catch(e){
+    const msg='Supabase 서버에 연결하지 못했습니다.\n'+(e?.message||String(e))+
+      '\n\nProject URL을 다시 확인해주세요.';
+    if(showAlert) alert(msg);
+    return {ok:false,msg};
+  }
+}
+
+async function resetCloudConfigFromLogin(){
   const currentUrl=getProjectUrl();
   const currentKey=getPublishableKey();
   const url=prompt(
@@ -350,81 +380,124 @@ function resetCloudConfigFromLogin(){
     currentKey
   );
   if(key===null)return;
-  if(saveCloudConfig(url,key)){
-    alert('Supabase 연결 정보를 저장했어요.\n이제 「연결 상태 확인」을 눌러주세요.');
-  }
+  if(!saveCloudConfig(url,key))return;
+  alert('Supabase 연결 정보를 저장했습니다.\n이제 서버 연결을 확인합니다.');
+  await directConnectionCheck(true);
 }
 
 async function testCloudConnection(){
+  alert('연결 상태 확인을 시작합니다.');
+  const result=await directConnectionCheck(false);
   const box=$('loginError');
-  const show=(msg,ok=false)=>{
-    if(box){
-      box.style.display='block';
-      box.style.borderColor=ok?'#244934':'#5a2828';
-      box.style.background=ok?'#0e1812':'#1c1010';
-      box.style.color=ok?'#99d4b1':'#f2a3a3';
-      box.textContent=msg;
-    }
-  };
-  const url=getProjectUrl(), key=getPublishableKey();
-  if(!url || !key){
-    show('Supabase Project URL 또는 Publishable key가 없습니다.\n「Supabase 연결 다시 설정」을 눌러주세요.');
-    return;
+  if(box){
+    box.style.display='block';
+    box.style.borderColor=result.ok?'#244934':'#5a2828';
+    box.style.background=result.ok?'#0e1812':'#1c1010';
+    box.style.color=result.ok?'#99d4b1':'#f2a3a3';
+    box.textContent=result.msg;
   }
-  try{
-    const r=await fetch(url+'/rest/v1/',{
-      method:'GET',
-      headers:{apikey:key,Authorization:'Bearer '+key}
-    });
-    if(r.status===200 || r.status===404){
-      initSupabase();
-      show('Supabase 서버 연결은 정상입니다.\nProject URL의 DNS 연결까지 확인됐어요.',true);
-    }else{
-      show('Supabase 서버에는 연결됐지만 응답 상태가 '+r.status+' 입니다.\nProject URL과 Publishable key를 다시 확인해주세요.');
-    }
-  }catch(e){
-    show('Supabase 서버에 연결하지 못했습니다.\n'+(e?.message||String(e))+
-         '\n\nProject URL을 Data API 화면에서 다시 복사해 입력해주세요.');
-  }
-}
-
-function clearCloudConfig(){
-  if(confirm('이 브라우저에 저장된 Supabase Project URL과 Publishable key를 삭제할까요?')){
-    localStorage.removeItem(URL_STORE);
-    localStorage.removeItem(KEY_STORE);
-    location.reload();
-  }
+  alert(result.msg);
 }
 
 async function login(){
  const errBox=$('loginError');
- const showErr=(msg)=>{if(errBox){errBox.style.display='block';errBox.textContent=msg} alert(msg)};
+ const showErr=(msg)=>{
+   if(errBox){
+     errBox.style.display='block';
+     errBox.style.borderColor='#5a2828';
+     errBox.style.background='#1c1010';
+     errBox.style.color='#f2a3a3';
+     errBox.textContent=msg;
+   }
+   alert(msg);
+ };
  if(errBox){errBox.style.display='none';errBox.textContent=''}
+ alert('로그인 요청을 시작합니다.');
  try{
-   if(!initSupabase()){
-     showErr('Supabase 연결 정보가 없거나 올바르지 않습니다.\n「Supabase 연결 다시 설정」에서 Project URL과 Publishable key를 먼저 입력해주세요.');
+   const url=getProjectUrl(), key=getPublishableKey();
+   if(!url||!key){
+     showErr('Supabase 연결 정보가 없습니다.\n먼저 「Supabase 연결 다시 설정」을 눌러주세요.');
      return;
    }
    const email=$('loginId').value.trim();
    const password=$('loginPw').value;
    if(!email||!password){showErr('이메일과 비밀번호를 모두 입력해주세요.');return}
-   const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
-   if(error){
-     const code=error.code||error.status||'unknown';
-     showErr('Supabase 로그인 오류\\n코드: '+code+'\\n내용: '+error.message+'\\n\\n※ 이메일/비밀번호가 맞다면 이 메시지를 캡처해 보내주세요.');
-     return
+
+   const authRes=await fetch(url+'/auth/v1/token?grant_type=password',{
+     method:'POST',
+     headers:{
+       apikey:key,
+       'Content-Type':'application/json'
+     },
+     body:JSON.stringify({email,password})
+   });
+
+   const authText=await authRes.text();
+   let authData={};
+   try{authData=JSON.parse(authText)}catch{}
+
+   if(!authRes.ok){
+     showErr('Supabase 로그인 실패\nHTTP '+authRes.status+'\n'+
+       (authData.msg||authData.message||authData.error_description||authText||'알 수 없는 오류'));
+     return;
    }
-   if(!data?.user){showErr('로그인은 처리됐지만 사용자 정보를 받지 못했습니다.');return}
-   const {data:profile,error:pe}=await supabaseClient.from('staff_profiles').select('title,role').eq('user_id',data.user.id).single();
-   if(pe||!profile){
-     await supabaseClient.auth.signOut();
-     showErr('로그인은 성공했지만 YEIL 직책 정보를 찾지 못했습니다.\\n'+(pe?.message||'staff_profiles 확인 필요'));
-     return
+
+   if(!authData.access_token || !authData.user){
+     showErr('로그인 응답은 왔지만 세션 정보가 없습니다.');
+     return;
    }
-   currentUser={id:data.user.id,email:data.user.email,name:profile.title,role:profile.role};
-   await showApp()
+
+   // staff_profiles를 REST로 직접 조회
+   const profileRes=await fetch(
+     url+'/rest/v1/staff_profiles?select=title,role&user_id=eq.'+encodeURIComponent(authData.user.id),
+     {
+       headers:{
+         apikey:key,
+         Authorization:'Bearer '+authData.access_token,
+         Accept:'application/json'
+       }
+     }
+   );
+   const profileText=await profileRes.text();
+   let profiles=[];
+   try{profiles=JSON.parse(profileText)}catch{}
+
+   if(!profileRes.ok || !Array.isArray(profiles) || !profiles[0]){
+     showErr('로그인은 성공했지만 YEIL 직책 정보를 찾지 못했습니다.\n'+
+       (profileText||'staff_profiles 확인 필요'));
+     return;
+   }
+
+   // Supabase JS 라이브러리가 있으면 이후 기존 기능을 위해 세션을 연결
+   if(!window.supabase){
+     showErr('로그인은 성공했지만 Supabase JS 라이브러리를 불러오지 못했습니다.\n페이지를 Ctrl+F5로 새로고침해주세요.');
+     return;
+   }
+   if(!initSupabase()){
+     showErr('Supabase 클라이언트를 시작하지 못했습니다.');
+     return;
+   }
+   const {error:setErr}=await supabaseClient.auth.setSession({
+     access_token:authData.access_token,
+     refresh_token:authData.refresh_token
+   });
+   if(setErr){
+     showErr('로그인 세션 연결 실패: '+setErr.message);
+     return;
+   }
+
+   const profile=profiles[0];
+   currentUser={
+     id:authData.user.id,
+     email:authData.user.email,
+     name:profile.title,
+     role:profile.role
+   };
+   await loadCloudData();
+   showApp();
+   subscribeRealtime();
  }catch(e){
-   showErr('연결 중 오류가 발생했습니다.\\n'+(e?.message||String(e))+'\\n\\n인터넷 연결 또는 Publishable key를 확인해주세요.');
+   showErr('로그인 통신 중 오류가 발생했습니다.\n'+(e?.message||String(e)));
  }
 }
 
