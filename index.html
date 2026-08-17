@@ -75,7 +75,7 @@ th{color:#d2bd88;background:#12110f;position:sticky;top:0}.money{color:var(--gol
 <div id="loginView">
   <div class="login-card">
     <div class="logo"><img src="yeil-logo.jpg" alt="YEIL 로고"></div>
-    <div class="brand-text"><h1>YEIL</h1><p>BUSINESS MANAGEMENT SYSTEM</p></div>
+    <div class="brand-text"><h1>YEIL</h1><p>BUSINESS MANAGEMENT SYSTEM · v2.4</p></div>
     <div class="field"><label>이메일</label><input id="loginId" type="email" autocomplete="username" placeholder="Supabase에 등록한 이메일"></div>
     <div class="field"><label>비밀번호</label><input id="loginPw" type="password" autocomplete="current-password" placeholder="비밀번호 입력"></div>
     <button class="btn primary" style="width:100%" onclick="login()">LOGIN</button>
@@ -301,6 +301,9 @@ const KEY_STORE='yeil_supabase_publishable_key';
 let supabaseClient=null;
 let activeCloudSignature='';
 
+function updateConfigState(){
+  // v2.4 compatibility helper: intentionally no-op.
+}
 function cleanProjectUrl(v){
   let x=String(v||'').trim().replace(/\/+$/,'');
   x=x.replace(/\/rest\/v1$/,'');
@@ -334,7 +337,6 @@ function saveCloudConfig(url,key){
   localStorage.setItem(URL_STORE,u);
   localStorage.setItem(KEY_STORE,k);
   supabaseClient=null; activeCloudSignature='';
-  updateConfigState();
   return true;
 }
 
@@ -527,7 +529,7 @@ function showApp(){
  $('userChip').textContent=currentUser.name;
  document.querySelectorAll('.admin-only').forEach(el=>el.style.display=currentUser.role==='admin'?'':'none');
  $('todayLabel').textContent=new Intl.DateTimeFormat('ko-KR',{dateStyle:'full',timeZone:'Asia/Seoul'}).format(new Date());
- initForms();renderAll();updateConfigState()
+ initForms();renderAll()
 }
 function toggleMenu(){$('sidebar').classList.toggle('open')}
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>{
@@ -644,7 +646,7 @@ function renderAnalytics(){
 function renderPrices(){$('priceRows').innerHTML=PRICE_ROWS.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td class="money">${won(r[2])}</td><td class="money">${won(r[3])}</td><td class="money">${won(r[4])}</td></tr>`).join('')}
 function renderAccounts(){$('accountList').innerHTML=currentUser?`<div class="quote-line"><div><b>${esc(currentUser.name)}</b><br><small>${esc(currentUser.email||'')}</small></div><span class="badge">${currentUser.role==='admin'?'관리자':'현장'}</span></div>`:''}
 async function restoreSession(){
- updateConfigState();if(!initSupabase())return;
+ if(!initSupabase())return;
  const {data}=await supabaseClient.auth.getSession();const user=data.session?.user;if(!user)return;
  const {data:profile}=await supabaseClient.from('staff_profiles').select('title,role').eq('user_id',user.id).single();
  if(!profile)return;currentUser={id:user.id,email:user.email,name:profile.title,role:profile.role};await loadCloudData();showApp();subscribeRealtime();
