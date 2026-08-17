@@ -6,652 +6,208 @@
 <meta name="theme-color" content="#080808"/>
 <title>YEIL Business Management</title>
 <style>
-:root{
-  --bg:#080808;--panel:#111;--panel2:#171717;--line:#2a2418;
-  --gold:#d7b464;--gold2:#f0d58b;--text:#f7f4ed;--muted:#a9a49a;
-  --danger:#d06a6a;--ok:#71b48d;--warn:#d6a85d;--shadow:0 16px 42px rgba(0,0,0,.34)
-}
-*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#050505,#0d0b08 42%,#070707);color:var(--text);font-family:Pretendard,"Noto Sans KR",system-ui,-apple-system,Segoe UI,sans-serif}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
-#loginView{min-height:100vh;display:grid;place-items:center;padding:24px}
-.login-card{width:min(440px,100%);background:rgba(17,17,17,.95);border:1px solid #342d1e;border-radius:24px;padding:28px;box-shadow:var(--shadow)}
-.logo{display:flex;justify-content:center;margin-bottom:18px}
-.logo img{width:180px;max-height:120px;object-fit:contain;border-radius:14px}
-.brand-text{text-align:center;margin-bottom:24px}.brand-text h1{letter-spacing:.26em;margin:0;color:var(--gold2);font-size:24px}.brand-text p{color:var(--muted);font-size:12px;letter-spacing:.12em}
-label{display:block;font-size:12px;color:#c9c2b3;margin:0 0 7px}
-.field{margin-bottom:14px}
-input,select,textarea{width:100%;background:#0d0d0d;color:#fff;border:1px solid #383125;border-radius:12px;padding:12px 13px;outline:none}
-input:focus,select:focus,textarea:focus{border-color:var(--gold)}
-textarea{min-height:80px;resize:vertical}
-.btn{border:1px solid #4a3d24;background:#19150e;color:var(--gold2);padding:11px 14px;border-radius:12px;font-weight:700}
-.btn.primary{background:linear-gradient(135deg,#b8913f,#e1c477);color:#0b0905;border:none}
-.btn.ghost{background:#111;color:#ddd;border-color:#303030}.btn.danger{border-color:#5a2828;color:#f2a3a3;background:#1c1010}.btn.ok{border-color:#244934;color:#99d4b1;background:#0e1812}
-.login-help{margin-top:16px;padding:12px;border-radius:12px;background:#0a0a0a;border:1px dashed #3b3427;color:#9d988e;font-size:12px;line-height:1.65}
-#appView{min-height:100vh}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:250px;background:#090909;border-right:1px solid #2e281d;padding:20px 14px;z-index:5;overflow:auto}
-.side-brand{display:flex;align-items:center;gap:10px;padding:5px 8px 18px;border-bottom:1px solid #242018}
-.side-brand img{width:54px;height:54px;border-radius:10px;object-fit:cover}
-.side-brand strong{color:var(--gold2);letter-spacing:.12em}.side-brand small{display:block;color:#777;margin-top:3px}
-.nav{display:grid;gap:7px;margin-top:16px}
-.nav button{border:0;background:transparent;color:#bbb;text-align:left;padding:12px;border-radius:11px}
-.nav button.active,.nav button:hover{background:linear-gradient(90deg,#2a2214,#15120d);color:var(--gold2)}
-.main{margin-left:250px;padding:24px}
-.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
-.topbar h2{margin:0;font-size:24px}.topbar .meta{color:#9f998e;font-size:13px}
-.user-chip{border:1px solid #393020;background:#10100f;border-radius:999px;padding:9px 13px;color:#d9caa8;font-size:13px}
-.grid{display:grid;gap:14px}.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
-.card{background:linear-gradient(180deg,#131313,#0d0d0d);border:1px solid #2d271c;border-radius:18px;padding:18px;box-shadow:0 10px 28px rgba(0,0,0,.18)}
-.card h3{margin:0 0 12px;font-size:15px;color:#ece7dc}.kpi .label{font-size:12px;color:#8f8a81}.kpi .value{font-size:24px;margin-top:7px;font-weight:800;color:var(--gold2)}.kpi .sub{font-size:11px;color:#777;margin-top:5px}
-.two{grid-template-columns:1.2fr .8fr}.three{grid-template-columns:repeat(3,1fr)}
-.section{display:none}.section.active{display:block}
-.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 14px}.section-title h3{margin:0;font-size:18px}
-.table-wrap{overflow:auto;border:1px solid #29241b;border-radius:14px}
-table{width:100%;border-collapse:collapse;min-width:760px;background:#0c0c0c}
-th,td{padding:11px;border-bottom:1px solid #222;text-align:left;font-size:13px}
-th{color:#d2bd88;background:#12110f;position:sticky;top:0}.money{color:var(--gold2);font-weight:800}
-.badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:11px;border:1px solid #39342b;color:#bbb}.badge.done{color:#9ed7b3;border-color:#294c37}.badge.cancel{color:#e79a9a;border-color:#583030}
-.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.span2{grid-column:span 2}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
-.quote-lines{display:grid;gap:9px}.quote-line{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:11px;border-radius:12px;background:#0a0a0a;border:1px solid #242018}
-.quote-line small{color:#8f8a81}.summary{display:grid;gap:8px}.summary .row{display:flex;justify-content:space-between;border-bottom:1px dashed #2a251c;padding:9px 0}.summary .total{font-size:19px;color:var(--gold2);font-weight:900}
-.notice{font-size:12px;color:#aaa;background:#0b0b0b;border-left:3px solid var(--gold);padding:10px 12px;border-radius:8px}
-.empty{color:#777;padding:20px;text-align:center}
-.mobile-menu{display:none}
-@media(max-width:980px){
- .sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}
- .main{margin-left:0;padding:16px}.mobile-menu{display:inline-flex}
- .kpis{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr}
-}
-@media(max-width:620px){
- .kpis{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.span2{grid-column:auto}
- .topbar h2{font-size:19px}.card{padding:14px}.quote-line{grid-template-columns:1fr auto}
-}
+:root{--bg:#080808;--panel:#111;--line:#2f281d;--gold:#d7b464;--gold2:#f0d58b;--text:#f7f4ed;--muted:#aaa;--danger:#e08a8a}
+*{box-sizing:border-box}body{margin:0;background:#080808;color:var(--text);font-family:system-ui,"Noto Sans KR",sans-serif}button,input,select,textarea{font:inherit}
+button{cursor:pointer}.hidden{display:none!important}.card{background:#111;border:1px solid var(--line);border-radius:18px;padding:18px}.btn{border:1px solid #4a3d24;background:#17130d;color:var(--gold2);padding:11px 14px;border-radius:12px;font-weight:700}.btn.primary{background:linear-gradient(135deg,#b8913f,#e1c477);color:#0b0905;border:0}.btn.danger{background:#1c1010;color:#f0aaaa;border-color:#5a2828}.btn.ghost{background:#111;color:#ddd;border-color:#333}
+input,select,textarea{width:100%;background:#0d0d0d;color:#fff;border:1px solid #383125;border-radius:12px;padding:12px;outline:none}label{display:block;font-size:12px;color:#c9c2b3;margin:0 0 6px}.field{margin-bottom:12px}
+#loginView{min-height:100vh;display:grid;place-items:center;padding:22px}.login-card{width:min(440px,100%)}.logo{text-align:center}.logo img{width:180px;max-height:120px;object-fit:contain;border-radius:14px}.brand{text-align:center;margin:18px 0}.brand h1{letter-spacing:.25em;color:var(--gold2);margin:0}.brand p{color:var(--muted);font-size:12px}
+.msg{display:none;margin-top:12px;padding:12px;border-radius:12px;font-size:12px;white-space:pre-wrap}.msg.ok{display:block;background:#0e1812;border:1px solid #244934;color:#99d4b1}.msg.err{display:block;background:#1c1010;border:1px solid #5a2828;color:#f2a3a3}
+#appView{min-height:100vh}.sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:#090909;border-right:1px solid var(--line);padding:16px;overflow:auto}.side-brand{display:flex;gap:10px;align-items:center;padding-bottom:14px;border-bottom:1px solid #242018}.side-brand img{width:52px;height:52px;object-fit:cover;border-radius:10px}.nav{display:grid;gap:7px;margin-top:14px}.nav button{background:transparent;border:0;color:#bbb;text-align:left;padding:12px;border-radius:10px}.nav button.active,.nav button:hover{background:#211a10;color:var(--gold2)}
+.main{margin-left:240px;padding:22px}.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}.actions{display:flex;gap:8px;flex-wrap:wrap}.grid{display:grid;gap:14px}.kpis{grid-template-columns:repeat(4,1fr)}.two{grid-template-columns:1.2fr .8fr}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.span2{grid-column:span 2}.section{display:none}.section.active{display:block}.value{font-size:24px;color:var(--gold2);font-weight:800}.muted{color:#999;font-size:12px}.section-title{display:flex;justify-content:space-between;align-items:center;margin:5px 0 12px}.table-wrap{overflow:auto;border:1px solid #29241b;border-radius:14px}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:10px;border-bottom:1px solid #222;text-align:left;font-size:13px}th{color:#d2bd88;background:#12110f}.money{color:var(--gold2);font-weight:800}.quote-line{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px;border:1px solid #242018;border-radius:12px;margin-bottom:8px}.notice{font-size:12px;color:#aaa;border-left:3px solid var(--gold);padding:10px;background:#0b0b0b}.mobile-menu{display:none}
+@media(max-width:900px){.sidebar{transform:translateX(-100%);z-index:5}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.mobile-menu{display:inline-block}.kpis{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}.span2{grid-column:auto}.kpis{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
-
 <div id="loginView">
-  <div class="login-card">
-    <div class="logo"><img src="yeil-logo.jpg" alt="YEIL 로고"></div>
-    <div class="brand-text"><h1>YEIL</h1><p>BUSINESS MANAGEMENT SYSTEM · v2.4</p></div>
-    <div class="field"><label>이메일</label><input id="loginId" type="email" autocomplete="username" placeholder="Supabase에 등록한 이메일"></div>
-    <div class="field"><label>비밀번호</label><input id="loginPw" type="password" autocomplete="current-password" placeholder="비밀번호 입력"></div>
-    <button class="btn primary" style="width:100%" onclick="login()">LOGIN</button>
-    <div class="actions" style="margin-top:10px;justify-content:center">
-      <button class="btn ghost" type="button" onclick="resetCloudConfigFromLogin()">Supabase 연결 다시 설정</button>
-      <button class="btn ghost" type="button" onclick="testCloudConnection()">연결 상태 확인</button>
+  <div class="card login-card">
+    <div class="logo"><img src="yeil-logo.jpg" alt="YEIL"></div>
+    <div class="brand"><h1>YEIL</h1><p>BUSINESS MANAGEMENT SYSTEM · FINAL</p></div>
+    <div class="field"><label>이메일</label><input id="loginId" type="email" autocomplete="username"></div>
+    <div class="field"><label>비밀번호</label><input id="loginPw" type="password" autocomplete="current-password"></div>
+    <button id="loginBtn" class="btn primary" style="width:100%">LOGIN</button>
+    <div class="actions" style="justify-content:center;margin-top:10px">
+      <button id="configBtn" class="btn ghost" type="button">Supabase 연결 다시 설정</button>
+      <button id="checkBtn" class="btn ghost" type="button">연결 상태 확인</button>
     </div>
-    <div id="loginError" style="display:none;margin-top:12px;padding:12px;border:1px solid #5a2828;background:#1c1010;color:#f2a3a3;border-radius:12px;font-size:12px;line-height:1.6;white-space:pre-wrap"></div>
-    <div class="login-help">
-      Supabase에 등록한 본인 이메일과 비밀번호로 로그인하세요.<br>
-      총괄이사 · 대표 · 실장 계정의 직책은 서버에서 자동으로 확인합니다.<br>
-      <span id="configState">v2.3 · Supabase 연결 설정 확인 중...</span>
-    </div>
+    <div id="loginMsg" class="msg"></div>
+    <div class="notice" style="margin-top:14px">처음 한 번만 Project URL과 Publishable key를 저장하면 됩니다. Secret key는 사용하지 않습니다.</div>
   </div>
 </div>
 
 <div id="appView" class="hidden">
-  <aside class="sidebar" id="sidebar">
-    <div class="side-brand"><img src="yeil-logo.jpg"><div><strong>YEIL</strong><small>Management</small></div></div>
+  <aside id="sidebar" class="sidebar">
+    <div class="side-brand"><img src="yeil-logo.jpg"><div><b style="color:var(--gold2)">YEIL</b><div class="muted">Management</div></div></div>
     <div class="nav">
       <button class="active" data-page="home">🏠 홈</button>
       <button data-page="reservation">📅 예약관리</button>
       <button data-page="quote">🧾 견적관리</button>
       <button data-page="settlement">💰 정산관리</button>
       <button data-page="partners">🏢 거래처관리</button>
-      <button data-page="sales">📞 영업관리</button>
       <button data-page="analytics">📊 경영분석</button>
-      <button data-page="prices" class="admin-only">⚙️ 단가관리</button>
-      <button data-page="settings" class="admin-only">👤 계정/설정</button>
+      <button data-page="settings">👤 계정/설정</button>
     </div>
   </aside>
-
   <main class="main">
     <div class="topbar">
-      <div style="display:flex;align-items:center;gap:10px">
-        <button class="btn ghost mobile-menu" onclick="toggleMenu()">☰</button>
-        <div><h2 id="pageTitle">홈</h2><div class="meta" id="todayLabel"></div></div>
-      </div>
-      <div class="actions"><span class="user-chip" id="userChip"></span><button class="btn ghost" onclick="logout()">로그아웃</button></div>
+      <div class="actions"><button id="menuBtn" class="btn ghost mobile-menu">☰</button><div><h2 id="pageTitle" style="margin:0">홈</h2><div id="todayLabel" class="muted"></div></div></div>
+      <div class="actions"><span id="userChip" class="btn ghost"></span><button id="logoutBtn" class="btn ghost">로그아웃</button></div>
     </div>
 
     <section id="home" class="section active">
       <div class="grid kpis">
-        <div class="card kpi"><div class="label">오늘 예약</div><div class="value" id="kToday">0건</div><div class="sub">취소 제외</div></div>
-        <div class="card kpi"><div class="label">이번 달 완료</div><div class="value" id="kDone">0건</div><div class="sub">작업 완료 기준</div></div>
-        <div class="card kpi"><div class="label">이번 달 매출</div><div class="value" id="kSales">0원</div><div class="sub">완료 예약 합계</div></div>
-        <div class="card kpi"><div class="label">미수금</div><div class="value" id="kUnpaid">0원</div><div class="sub">결제대기 건</div></div>
+        <div class="card"><div class="muted">오늘 예약</div><div id="kToday" class="value">0건</div></div>
+        <div class="card"><div class="muted">이번 달 완료</div><div id="kDone" class="value">0건</div></div>
+        <div class="card"><div class="muted">이번 달 매출</div><div id="kSales" class="value">0원</div></div>
+        <div class="card"><div class="muted">미수금</div><div id="kUnpaid" class="value">0원</div></div>
       </div>
       <div class="grid two" style="margin-top:14px">
         <div class="card"><h3>오늘 일정</h3><div id="homeSchedule"></div></div>
-        <div class="card"><h3>오늘 영업관리</h3><div id="homeFollowups"></div></div>
+        <div class="card"><h3>오늘 연락할 거래처</h3><div id="homeFollowups"></div></div>
       </div>
     </section>
 
     <section id="reservation" class="section">
-      <div class="section-title"><h3>예약 등록 / 수정</h3><button class="btn ghost" onclick="resetReservationForm()">새 예약</button></div>
+      <div class="section-title"><h3>예약 등록 / 수정</h3><button id="newResBtn" class="btn ghost">새 예약</button></div>
       <div class="card">
-        <input type="hidden" id="rId">
+        <input id="rId" type="hidden">
         <div class="form-grid">
-          <div><label>예약일</label><input id="rDate" type="date"></div>
-          <div><label>시간</label><input id="rTime" type="time"></div>
-          <div><label>고객명</label><input id="rCustomer"></div>
-          <div><label>연락처</label><input id="rPhone"></div>
+          <div><label>예약일</label><input id="rDate" type="date"></div><div><label>시간</label><input id="rTime" type="time"></div>
+          <div><label>고객명</label><input id="rCustomer"></div><div><label>연락처</label><input id="rPhone"></div>
           <div class="span2"><label>주소</label><input id="rAddress"></div>
           <div><label>담당자</label><select id="rAssignee"><option>대표</option><option>총괄이사</option><option>실장</option></select></div>
           <div><label>상태</label><select id="rStatus"><option>예약접수</option><option>일정확정</option><option>출발</option><option>작업중</option><option>작업완료</option><option>취소</option></select></div>
           <div><label>고객유형</label><select id="rCustomerType"><option>일반고객</option><option>거래처</option></select></div>
           <div><label>거래처</label><select id="rPartner"><option value="">없음</option></select></div>
-          <div><label>견적금액</label><input id="rAmount" type="number" min="0"></div>
-          <div><label>결제상태</label><select id="rPayment"><option>미결제</option><option>결제완료</option></select></div>
-          <div class="span2"><label>작업내용</label><input id="rWork" placeholder="예: 양문형 800L 이상 이전"></div>
-          <div class="span2"><label>특이사항</label><textarea id="rMemo"></textarea></div>
+          <div><label>견적금액</label><input id="rAmount" type="number"></div><div><label>결제상태</label><select id="rPayment"><option>미결제</option><option>결제완료</option></select></div>
+          <div class="span2"><label>작업내용</label><input id="rWork"></div><div class="span2"><label>특이사항</label><textarea id="rMemo"></textarea></div>
         </div>
-        <div class="actions" style="margin-top:12px"><button class="btn primary" onclick="saveReservation()">저장</button><button class="btn ghost" onclick="resetReservationForm()">초기화</button></div>
+        <div class="actions" style="margin-top:12px"><button id="saveResBtn" class="btn primary">저장</button><button id="resetResBtn" class="btn ghost">초기화</button></div>
       </div>
-      <div class="section-title" style="margin-top:20px"><h3>예약 목록</h3></div>
-      <div class="table-wrap"><table><thead><tr><th>일정</th><th>고객</th><th>작업</th><th>담당</th><th>상태</th><th>금액</th><th>결제</th><th>관리</th></tr></thead><tbody id="reservationRows"></tbody></table></div>
+      <div class="table-wrap" style="margin-top:16px"><table><thead><tr><th>일정</th><th>고객</th><th>작업</th><th>담당</th><th>상태</th><th>금액</th><th>결제</th><th>관리</th></tr></thead><tbody id="reservationRows"></tbody></table></div>
     </section>
 
     <section id="quote" class="section">
       <div class="grid two">
         <div class="card">
           <h3>자동 견적</h3>
-          <div class="form-grid">
-            <div><label>품목</label><select id="qItem" onchange="refreshQuoteOptions()"></select></div>
-            <div><label>세부구분</label><select id="qVariant"></select></div>
-            <div><label>작업</label><select id="qWork"><option>이전</option><option>재설치</option><option>철거</option></select></div>
-            <div><label>수량</label><input id="qQty" type="number" min="1" value="1"></div>
-          </div>
-          <div class="actions" style="margin-top:12px"><button class="btn primary" onclick="addQuoteLine()">품목 추가</button></div>
-          <hr style="border:0;border-top:1px solid #29241c;margin:18px 0">
-          <div class="form-grid">
-            <div><label>추가작업비</label><input id="qExtra" type="number" value="0" oninput="renderQuote()"></div>
-            <div><label>사다리차</label><input id="qLadder" type="number" value="0" oninput="renderQuote()"></div>
-            <div><label>스카이</label><input id="qSky" type="number" value="0" oninput="renderQuote()"></div>
-            <div><label>할인</label><input id="qDiscount" type="number" value="0" oninput="renderQuote()"></div>
-          </div>
+          <div class="form-grid"><div><label>품목</label><select id="qItem"></select></div><div><label>세부구분</label><select id="qVariant"></select></div><div><label>작업</label><select id="qWork"><option>이전</option><option>재설치</option><option>철거</option></select></div><div><label>수량</label><input id="qQty" type="number" value="1" min="1"></div></div>
+          <button id="addQuoteBtn" class="btn primary" style="margin-top:12px">품목 추가</button>
+          <div class="form-grid" style="margin-top:14px"><div><label>추가작업비</label><input id="qExtra" type="number" value="0"></div><div><label>사다리차</label><input id="qLadder" type="number" value="0"></div><div><label>스카이</label><input id="qSky" type="number" value="0"></div><div><label>할인</label><input id="qDiscount" type="number" value="0"></div></div>
         </div>
-        <div class="card">
-          <h3>견적 내역</h3>
-          <div id="quoteLines" class="quote-lines"></div>
-          <div class="summary" style="margin-top:14px">
-            <div class="row"><span>품목 합계</span><b id="qSubtotal">0원</b></div>
-            <div class="row"><span>추가비용</span><b id="qExtras">0원</b></div>
-            <div class="row total"><span>최종 견적</span><span id="qTotal">0원</span></div>
-          </div>
-          <div class="actions" style="margin-top:14px"><button class="btn primary" onclick="copyQuote()">견적 복사</button><button class="btn ghost" onclick="useQuoteForReservation()">예약에 적용</button><button class="btn danger" onclick="clearQuote()">전체 삭제</button></div>
-        </div>
+        <div class="card"><h3>견적 내역</h3><div id="quoteLines"></div><div class="value" id="qTotal">0원</div><div class="actions" style="margin-top:12px"><button id="copyQuoteBtn" class="btn primary">견적 복사</button><button id="useQuoteBtn" class="btn ghost">예약에 적용</button><button id="clearQuoteBtn" class="btn danger">전체 삭제</button></div></div>
       </div>
     </section>
 
     <section id="settlement" class="section">
-      <div class="grid kpis">
-        <div class="card kpi"><div class="label">완료 매출</div><div class="value" id="sRevenue">0원</div></div>
-        <div class="card kpi"><div class="label">등록 비용</div><div class="value" id="sCost">0원</div></div>
-        <div class="card kpi"><div class="label">예상 이익</div><div class="value" id="sProfit">0원</div></div>
-        <div class="card kpi"><div class="label">미수금</div><div class="value" id="sUnpaid">0원</div></div>
-      </div>
-      <div class="grid two" style="margin-top:14px">
-        <div class="card">
-          <h3>비용 등록</h3>
-          <div class="form-grid">
-            <div><label>날짜</label><input type="date" id="cDate"></div>
-            <div><label>구분</label><select id="cType"><option>사다리/스카이</option><option>외주비</option><option>차량비</option><option>광고비</option><option>소모품</option><option>기타</option></select></div>
-            <div><label>금액</label><input type="number" id="cAmount"></div>
-            <div><label>메모</label><input id="cMemo"></div>
-          </div>
-          <button class="btn primary" style="margin-top:12px" onclick="addCost()">비용 저장</button>
-        </div>
-        <div class="card"><h3>최근 비용</h3><div id="costList"></div></div>
-      </div>
+      <div class="grid kpis"><div class="card"><div class="muted">완료 매출</div><div id="sRevenue" class="value">0원</div></div><div class="card"><div class="muted">등록 비용</div><div id="sCost" class="value">0원</div></div><div class="card"><div class="muted">예상 이익</div><div id="sProfit" class="value">0원</div></div><div class="card"><div class="muted">미수금</div><div id="sUnpaid" class="value">0원</div></div></div>
+      <div class="grid two" style="margin-top:14px"><div class="card"><h3>비용 등록</h3><div class="form-grid"><div><label>날짜</label><input id="cDate" type="date"></div><div><label>구분</label><select id="cType"><option>사다리/스카이</option><option>외주비</option><option>차량비</option><option>광고비</option><option>소모품</option><option>기타</option></select></div><div><label>금액</label><input id="cAmount" type="number"></div><div><label>메모</label><input id="cMemo"></div></div><button id="saveCostBtn" class="btn primary" style="margin-top:12px">비용 저장</button></div><div class="card"><h3>최근 비용</h3><div id="costList"></div></div></div>
     </section>
 
     <section id="partners" class="section">
-      <div class="grid two">
-        <div class="card">
-          <h3>거래처 등록</h3>
-          <input type="hidden" id="pId">
-          <div class="form-grid">
-            <div><label>업체명</label><input id="pName"></div>
-            <div><label>업종</label><select id="pType"><option>이사업체</option><option>중고가전</option><option>인테리어</option><option>부동산/입주</option><option>기타</option></select></div>
-            <div><label>담당자</label><input id="pContact"></div>
-            <div><label>연락처</label><input id="pPhone"></div>
-            <div class="span2"><label>주소/지역</label><input id="pArea"></div>
-            <div><label>상태</label><select id="pStatus"><option>영업대상</option><option>첫 연락</option><option>관심</option><option>단가표 전달</option><option>협의중</option><option>거래중</option><option>휴면</option></select></div>
-            <div><label>다음 연락일</label><input type="date" id="pFollow"></div>
-            <div class="span2"><label>메모</label><textarea id="pMemo"></textarea></div>
-          </div>
-          <div class="actions" style="margin-top:12px"><button class="btn primary" onclick="savePartner()">저장</button><button class="btn ghost" onclick="resetPartner()">초기화</button></div>
-        </div>
-        <div class="card"><h3>거래처 현황</h3><div id="partnerCards"></div></div>
-      </div>
+      <div class="grid two"><div class="card"><h3>거래처 등록 / 수정</h3><input id="pId" type="hidden"><div class="form-grid"><div><label>업체명</label><input id="pName"></div><div><label>업종</label><select id="pType"><option>이사업체</option><option>중고가전</option><option>인테리어</option><option>부동산/입주</option><option>기타</option></select></div><div><label>담당자</label><input id="pContact"></div><div><label>연락처</label><input id="pPhone"></div><div class="span2"><label>주소/지역</label><input id="pArea"></div><div><label>상태</label><select id="pStatus"><option>영업대상</option><option>첫 연락</option><option>관심</option><option>단가표 전달</option><option>협의중</option><option>거래중</option><option>휴면</option></select></div><div><label>다음 연락일</label><input id="pFollow" type="date"></div><div class="span2"><label>메모</label><textarea id="pMemo"></textarea></div></div><div class="actions" style="margin-top:12px"><button id="savePartnerBtn" class="btn primary">저장</button><button id="resetPartnerBtn" class="btn ghost">초기화</button></div></div><div class="card"><h3>거래처 현황</h3><div id="partnerCards"></div></div></div>
     </section>
 
-    <section id="sales" class="section">
-      <div class="card"><h3>영업 파이프라인</h3><div id="salesPipeline" class="grid three"></div></div>
-    </section>
+    <section id="analytics" class="section"><div class="grid kpis"><div class="card"><div class="muted">총 작업건수</div><div id="aJobs" class="value">0건</div></div><div class="card"><div class="muted">평균 작업금액</div><div id="aAvg" class="value">0원</div></div><div class="card"><div class="muted">거래처 작업</div><div id="aPartnerJobs" class="value">0건</div></div><div class="card"><div class="muted">개인고객 작업</div><div id="aRetailJobs" class="value">0건</div></div></div></section>
 
-    <section id="analytics" class="section">
-      <div class="grid kpis">
-        <div class="card kpi"><div class="label">총 작업건수</div><div class="value" id="aJobs">0건</div></div>
-        <div class="card kpi"><div class="label">평균 작업금액</div><div class="value" id="aAvg">0원</div></div>
-        <div class="card kpi"><div class="label">거래처 작업</div><div class="value" id="aPartnerJobs">0건</div></div>
-        <div class="card kpi"><div class="label">개인고객 작업</div><div class="value" id="aRetailJobs">0건</div></div>
-      </div>
-      <div class="grid two" style="margin-top:14px">
-        <div class="card"><h3>담당자별 완료 건수</h3><div id="assigneeStats"></div></div>
-        <div class="card"><h3>거래처 TOP</h3><div id="partnerStats"></div></div>
-      </div>
-    </section>
-
-    <section id="prices" class="section">
-      <div class="card">
-        <div class="section-title"><h3>YEIL 기본 단가</h3><span class="notice">1차 버전은 확정 단가를 표시합니다. 다음 버전에서 관리자 직접수정 + 거래처별 단가 저장을 연결할 수 있습니다.</span></div>
-        <div class="table-wrap"><table><thead><tr><th>품목</th><th>구분</th><th>이전</th><th>재설치</th><th>철거</th></tr></thead><tbody id="priceRows"></tbody></table></div>
-      </div>
-    </section>
-
-    <section id="settings" class="section">
-      <div class="grid two">
-        <div class="card"><h3>계정</h3><div class="notice">Supabase Authentication으로 로그인하며 직책과 권한은 staff_profiles에서 확인합니다.</div><div id="accountList" style="margin-top:12px"></div></div>
-        <div class="card"><h3>클라우드 연결</h3><p style="color:#999;font-size:13px">예약 · 거래처 · 비용 데이터는 Supabase에 저장됩니다.</p><div class="notice">Publishable key는 이 브라우저에만 저장됩니다. Secret key는 절대 입력하지 마세요.</div><div class="field" style="margin-top:12px"><label>Publishable key</label><input id="publishableKeyInput" type="password" placeholder="sb_publishable_..."></div><div class="actions"><button class="btn primary" onclick="saveCloudConfig()">연결키 저장</button><button class="btn ghost" onclick="clearCloudConfig()">연결키 삭제</button></div></div>
-      </div>
-    </section>
+    <section id="settings" class="section"><div class="card"><h3>로그인 계정</h3><div id="accountInfo"></div><div class="notice" style="margin-top:12px">예약 · 거래처 · 비용은 Supabase에 저장되어 로그인한 기기끼리 동기화됩니다.</div><button id="reconfigBtn" class="btn ghost" style="margin-top:12px">Supabase 연결 다시 설정</button></div></section>
   </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
 <script>
-const PRICE_ROWS = [
- ['일반 냉장고','600L까지',70000,40000,35000],
- ['양문형 냉장고','800L 미만',100000,50000,40000],
- ['양문형 냉장고','800L 이상',120000,60000,50000],
- ['양문형 냉장고','900L 이상',140000,70000,60000],
- ['키친 핏','원도어',70000,40000,35000],
- ['김치 냉장고','뚜껑형',50000,40000,30000],
- ['김치 냉장고','스탠드 500 미만',70000,50000,35000],
- ['김치 냉장고','스탠드 500 이상',100000,60000,40000],
- ['TV (스탠드)','39인치 이하',50000,30000,20000],
- ['TV (스탠드)','40~49인치',60000,40000,30000],
- ['TV (스탠드)','50~59인치',70000,50000,35000],
- ['TV (스탠드)','60~69인치',100000,60000,40000],
- ['TV (스탠드)','70~79인치',120000,70000,45000],
- ['TV (스탠드)','80~89인치',150000,90000,50000],
- ['TV (벽걸이)','39인치 이하',60000,40000,20000],
- ['TV (벽걸이)','40~49인치',70000,50000,30000],
- ['TV (벽걸이)','50~59인치',80000,60000,40000],
- ['TV (벽걸이)','60~69인치',100000,70000,45000],
- ['TV (벽걸이)','70~79인치',150000,90000,50000],
- ['TV (벽걸이)','80~89인치',200000,120000,60000],
- ['일반 세탁기(통돌이)','기본',70000,40000,30000],
- ['드럼 세탁기','15KG 미만',70000,40000,30000],
- ['드럼 세탁기','15KG 이상',100000,60000,50000],
- ['건조기','14KG 미만 / 1단',70000,50000,40000],
- ['건조기','14KG 미만 / 2단',100000,60000,50000],
- ['건조기','14KG 이상 / 1단',100000,60000,40000],
- ['건조기','14KG 이상 / 2단',120000,70000,50000],
- ['콤보 세탁기','기본',180000,100000,80000]
+"use strict";
+const $=id=>document.getElementById(id);
+const URL_STORE="yeil_supabase_project_url",KEY_STORE="yeil_supabase_publishable_key";
+let client=null,currentUser=null,realtimeChannel=null;
+let db={reservations:[],partners:[],costs:[]},quoteLines=[];
+const PRICE_ROWS=[
+["일반 냉장고","600L까지",70000,40000,35000],["양문형 냉장고","800L 미만",100000,50000,40000],["양문형 냉장고","800L 이상",120000,60000,50000],["양문형 냉장고","900L 이상",140000,70000,60000],
+["김치 냉장고","뚜껑형",50000,40000,30000],["김치 냉장고","스탠드 500 미만",70000,50000,35000],["김치 냉장고","스탠드 500 이상",100000,60000,40000],
+["TV (스탠드)","39인치 이하",50000,30000,20000],["TV (스탠드)","40~49인치",60000,40000,30000],["TV (스탠드)","50~59인치",70000,50000,35000],["TV (스탠드)","60~69인치",100000,60000,40000],["TV (스탠드)","70~79인치",120000,70000,45000],["TV (스탠드)","80~89인치",150000,90000,50000],
+["TV (벽걸이)","39인치 이하",60000,40000,20000],["TV (벽걸이)","40~49인치",70000,50000,30000],["TV (벽걸이)","50~59인치",80000,60000,40000],["TV (벽걸이)","60~69인치",100000,70000,45000],["TV (벽걸이)","70~79인치",150000,90000,50000],["TV (벽걸이)","80~89인치",200000,120000,60000],
+["일반 세탁기(통돌이)","기본",70000,40000,30000],["드럼 세탁기","15KG 미만",70000,40000,30000],["드럼 세탁기","15KG 이상",100000,60000,50000],["건조기","14KG 미만 / 1단",70000,50000,40000],["건조기","14KG 미만 / 2단",100000,60000,50000],["건조기","14KG 이상 / 1단",100000,60000,40000],["건조기","14KG 이상 / 2단",120000,70000,50000]
 ];
-
-const URL_STORE='yeil_supabase_project_url';
-const KEY_STORE='yeil_supabase_publishable_key';
-let supabaseClient=null;
-let activeCloudSignature='';
-
-function updateConfigState(){
-  // v2.4 compatibility helper: intentionally no-op.
+const today=()=>new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Seoul"});
+const month=()=>today().slice(0,7);
+const won=n=>(Number(n)||0).toLocaleString("ko-KR")+"원";
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function showMsg(msg,ok=false){const b=$("loginMsg");b.className="msg "+(ok?"ok":"err");b.textContent=msg}
+function cleanUrl(v){return String(v||"").trim().replace(/\/rest\/v1\/?$/,"").replace(/\/+$/,"")}
+function getUrl(){return cleanUrl(localStorage.getItem(URL_STORE)||"")}
+function getKey(){return localStorage.getItem(KEY_STORE)||""}
+function initClient(){const u=getUrl(),k=getKey();if(!u||!k||!window.supabase)return false;client=window.supabase.createClient(u,k,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return true}
+async function configure(){
+ const u=prompt("Supabase Project URL을 입력해주세요.\\n예: https://xxxx.supabase.co",getUrl());if(u===null)return;
+ const k=prompt("Publishable key를 입력해주세요.\\nsb_publishable_... 로 시작하는 값",getKey());if(k===null)return;
+ const url=cleanUrl(u),key=String(k).trim();
+ if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)){showMsg("Project URL 형식을 확인해주세요.");return}
+ if(!key.startsWith("sb_publishable_")){showMsg("Publishable key 형식을 확인해주세요.");return}
+ localStorage.setItem(URL_STORE,url);localStorage.setItem(KEY_STORE,key);client=null;showMsg("연결 정보를 저장했습니다.",true);await checkConnection();
 }
-function cleanProjectUrl(v){
-  let x=String(v||'').trim().replace(/\/+$/,'');
-  x=x.replace(/\/rest\/v1$/,'');
-  return x;
+async function checkConnection(){
+ try{if(!initClient())throw new Error("연결 정보가 없거나 Supabase 라이브러리를 불러오지 못했습니다.");
+ const {error}=await client.auth.getSession();if(error)throw error;showMsg("Supabase 프로젝트 연결이 정상입니다.",true)}
+ catch(e){showMsg("연결 확인 실패: "+(e.message||e))}
 }
-function getProjectUrl(){return cleanProjectUrl(localStorage.getItem(URL_STORE)||'')}
-function getPublishableKey(){return localStorage.getItem(KEY_STORE)||''}
-
-function initSupabase(){
-  const url=getProjectUrl(), key=getPublishableKey();
-  if(!url || !key || !window.supabase)return false;
-  const sig=url+'|'+key;
-  if(supabaseClient && activeCloudSignature===sig)return true;
-  supabaseClient=window.supabase.createClient(url,key,{
-    auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
-  });
-  activeCloudSignature=sig;
-  return true;
-}
-
-function saveCloudConfig(url,key){
-  const u=cleanProjectUrl(url), k=String(key||'').trim();
-  if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(u)){
-    alert('Project URL 형식을 확인해주세요.\n예: https://xxxxxxxxxxxxxxxxxxxx.supabase.co');
-    return false;
-  }
-  if(!k.startsWith('sb_publishable_')){
-    alert('Publishable key 형식을 확인해주세요.\nsb_publishable_... 로 시작해야 합니다.');
-    return false;
-  }
-  localStorage.setItem(URL_STORE,u);
-  localStorage.setItem(KEY_STORE,k);
-  supabaseClient=null; activeCloudSignature='';
-  return true;
-}
-
-async function directConnectionCheck(showAlert=true){
-  const url=getProjectUrl(), key=getPublishableKey();
-  if(!url || !key){
-    const msg='Supabase Project URL 또는 Publishable key가 없습니다.';
-    if(showAlert) alert(msg);
-    return {ok:false,msg};
-  }
-  try{
-    const response=await fetch(url+'/auth/v1/settings',{
-      method:'GET',
-      headers:{apikey:key}
-    });
-    if(response.ok){
-      const msg='Supabase 서버 연결이 정상입니다.';
-      if(showAlert) alert(msg);
-      return {ok:true,msg};
-    }
-    const body=await response.text();
-    const msg='Supabase 서버 응답 오류: HTTP '+response.status+'\n'+body.slice(0,250);
-    if(showAlert) alert(msg);
-    return {ok:false,msg};
-  }catch(e){
-    const msg='Supabase 서버에 연결하지 못했습니다.\n'+(e?.message||String(e))+
-      '\n\nProject URL을 다시 확인해주세요.';
-    if(showAlert) alert(msg);
-    return {ok:false,msg};
-  }
-}
-
-async function resetCloudConfigFromLogin(){
-  const currentUrl=getProjectUrl();
-  const currentKey=getPublishableKey();
-  const url=prompt(
-    'Supabase Project URL을 입력해주세요.\nData API의 API URL에서 /rest/v1/ 을 제외한 주소입니다.',
-    currentUrl
-  );
-  if(url===null)return;
-  const key=prompt(
-    'Publishable key를 입력해주세요.\nSecret key가 아니라 sb_publishable_... 로 시작하는 값입니다.',
-    currentKey
-  );
-  if(key===null)return;
-  if(!saveCloudConfig(url,key))return;
-  alert('Supabase 연결 정보를 저장했습니다.\n이제 서버 연결을 확인합니다.');
-  await directConnectionCheck(true);
-}
-
-async function testCloudConnection(){
-  alert('연결 상태 확인을 시작합니다.');
-  const result=await directConnectionCheck(false);
-  const box=$('loginError');
-  if(box){
-    box.style.display='block';
-    box.style.borderColor=result.ok?'#244934':'#5a2828';
-    box.style.background=result.ok?'#0e1812':'#1c1010';
-    box.style.color=result.ok?'#99d4b1':'#f2a3a3';
-    box.textContent=result.msg;
-  }
-  alert(result.msg);
-}
-
 async function login(){
- const errBox=$('loginError');
- const showErr=(msg)=>{
-   if(errBox){
-     errBox.style.display='block';
-     errBox.style.borderColor='#5a2828';
-     errBox.style.background='#1c1010';
-     errBox.style.color='#f2a3a3';
-     errBox.textContent=msg;
-   }
-   alert(msg);
- };
- if(errBox){errBox.style.display='none';errBox.textContent=''}
- alert('로그인 요청을 시작합니다.');
  try{
-   const url=getProjectUrl(), key=getPublishableKey();
-   if(!url||!key){
-     showErr('Supabase 연결 정보가 없습니다.\n먼저 「Supabase 연결 다시 설정」을 눌러주세요.');
-     return;
-   }
-   const email=$('loginId').value.trim();
-   const password=$('loginPw').value;
-   if(!email||!password){showErr('이메일과 비밀번호를 모두 입력해주세요.');return}
-
-   const authRes=await fetch(url+'/auth/v1/token?grant_type=password',{
-     method:'POST',
-     headers:{
-       apikey:key,
-       'Content-Type':'application/json'
-     },
-     body:JSON.stringify({email,password})
-   });
-
-   const authText=await authRes.text();
-   let authData={};
-   try{authData=JSON.parse(authText)}catch{}
-
-   if(!authRes.ok){
-     showErr('Supabase 로그인 실패\nHTTP '+authRes.status+'\n'+
-       (authData.msg||authData.message||authData.error_description||authText||'알 수 없는 오류'));
-     return;
-   }
-
-   if(!authData.access_token || !authData.user){
-     showErr('로그인 응답은 왔지만 세션 정보가 없습니다.');
-     return;
-   }
-
-   // staff_profiles를 REST로 직접 조회
-   const profileRes=await fetch(
-     url+'/rest/v1/staff_profiles?select=title,role&user_id=eq.'+encodeURIComponent(authData.user.id),
-     {
-       headers:{
-         apikey:key,
-         Authorization:'Bearer '+authData.access_token,
-         Accept:'application/json'
-       }
-     }
-   );
-   const profileText=await profileRes.text();
-   let profiles=[];
-   try{profiles=JSON.parse(profileText)}catch{}
-
-   if(!profileRes.ok || !Array.isArray(profiles) || !profiles[0]){
-     showErr('로그인은 성공했지만 YEIL 직책 정보를 찾지 못했습니다.\n'+
-       (profileText||'staff_profiles 확인 필요'));
-     return;
-   }
-
-   // Supabase JS 라이브러리가 있으면 이후 기존 기능을 위해 세션을 연결
-   if(!window.supabase){
-     showErr('로그인은 성공했지만 Supabase JS 라이브러리를 불러오지 못했습니다.\n페이지를 Ctrl+F5로 새로고침해주세요.');
-     return;
-   }
-   if(!initSupabase()){
-     showErr('Supabase 클라이언트를 시작하지 못했습니다.');
-     return;
-   }
-   const {error:setErr}=await supabaseClient.auth.setSession({
-     access_token:authData.access_token,
-     refresh_token:authData.refresh_token
-   });
-   if(setErr){
-     showErr('로그인 세션 연결 실패: '+setErr.message);
-     return;
-   }
-
-   const profile=profiles[0];
-   currentUser={
-     id:authData.user.id,
-     email:authData.user.email,
-     name:profile.title,
-     role:profile.role
-   };
-   await loadCloudData();
-   showApp();
-   subscribeRealtime();
- }catch(e){
-   showErr('로그인 통신 중 오류가 발생했습니다.\n'+(e?.message||String(e)));
- }
+  if(!initClient())throw new Error("먼저 Supabase 연결을 설정해주세요.");
+  const email=$("loginId").value.trim(),password=$("loginPw").value;if(!email||!password)throw new Error("이메일과 비밀번호를 입력해주세요.");
+  $("loginBtn").disabled=true;
+  const {data,error}=await client.auth.signInWithPassword({email,password});if(error)throw error;
+  const {data:profile,error:pErr}=await client.from("staff_profiles").select("title,role").eq("user_id",data.user.id).single();if(pErr)throw new Error("로그인은 됐지만 직책 정보를 확인하지 못했습니다: "+pErr.message);
+  currentUser={id:data.user.id,email:data.user.email,name:profile.title||data.user.email,role:profile.role||"admin"};
+  await loadData();showApp();subscribe();
+ }catch(e){showMsg("로그인 실패: "+(e.message||e))}
+ finally{$("loginBtn").disabled=false}
 }
-
-async function logout(){if(supabaseClient)await supabaseClient.auth.signOut();location.reload()}
-async function loadCloudData(){
- const [rr,pp,cc]=await Promise.all([
-  supabaseClient.from('reservations').select('*').order('date',{ascending:false}),
-  supabaseClient.from('partners').select('*').order('created_at',{ascending:false}),
-  supabaseClient.from('costs').select('*').order('date',{ascending:false})
- ]);
- const err=rr.error||pp.error||cc.error;if(err){alert('클라우드 데이터를 불러오지 못했습니다: '+err.message);return}
- db.reservations=(rr.data||[]).map(r=>({...r,customerType:r.customer_type,partnerId:r.partner_id}));
- db.partners=pp.data||[];db.costs=cc.data||[];renderAll();
+async function restore(){
+ if(!initClient())return;
+ const {data}=await client.auth.getSession();const u=data.session?.user;if(!u)return;
+ const {data:p}=await client.from("staff_profiles").select("title,role").eq("user_id",u.id).single();if(!p)return;
+ currentUser={id:u.id,email:u.email,name:p.title||u.email,role:p.role||"admin"};await loadData();showApp();subscribe();
 }
-let realtimeChannel=null;
-function subscribeRealtime(){
- if(!supabaseClient)return;
- realtimeChannel=supabaseClient.channel('yeil-live')
-  .on('postgres_changes',{event:'*',schema:'public',table:'reservations'},loadCloudData)
-  .on('postgres_changes',{event:'*',schema:'public',table:'partners'},loadCloudData)
-  .on('postgres_changes',{event:'*',schema:'public',table:'costs'},loadCloudData)
-  .subscribe();
+async function logout(){if(client)await client.auth.signOut();location.reload()}
+async function loadData(){
+ const [r,p,c]=await Promise.all([client.from("reservations").select("*").order("date",{ascending:false}),client.from("partners").select("*").order("created_at",{ascending:false}),client.from("costs").select("*").order("date",{ascending:false})]);
+ const e=r.error||p.error||c.error;if(e)throw e;
+ db.reservations=(r.data||[]).map(x=>({...x,customerType:x.customer_type,partnerId:x.partner_id}));db.partners=p.data||[];db.costs=c.data||[];renderAll();
 }
-async function persist(){await loadCloudData()}
-function showApp(){
- $('loginView').classList.add('hidden');$('appView').classList.remove('hidden');
- $('userChip').textContent=currentUser.name;
- document.querySelectorAll('.admin-only').forEach(el=>el.style.display=currentUser.role==='admin'?'':'none');
- $('todayLabel').textContent=new Intl.DateTimeFormat('ko-KR',{dateStyle:'full',timeZone:'Asia/Seoul'}).format(new Date());
- initForms();renderAll()
-}
-function toggleMenu(){$('sidebar').classList.toggle('open')}
-document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>{
- document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
- document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));$(b.dataset.page).classList.add('active');
- $('pageTitle').textContent=b.textContent.replace(/^[^ ]+ /,'');$('sidebar').classList.remove('open');renderAll()
-}));
-function initForms(){
- $('rDate').value=today();$('cDate').value=today();
- refreshQuoteOptions(); renderPrices();
-}
-function renderAll(){renderHome();renderReservations();renderSettlement();renderPartners();renderAnalytics();renderPrices();renderAccounts();refreshPartnerSelect()}
-function renderHome(){
- const t=today(),m=month();
- const valid=db.reservations.filter(r=>r.status!=='취소');
- const mt=valid.filter(r=>r.date.startsWith(m));
- const done=mt.filter(r=>r.status==='작업완료');
- $('kToday').textContent=valid.filter(r=>r.date===t).length+'건';
- $('kDone').textContent=done.length+'건';
- $('kSales').textContent=won(done.reduce((s,r)=>s+Number(r.amount||0),0));
- $('kUnpaid').textContent=won(mt.filter(r=>r.payment!=='결제완료').reduce((s,r)=>s+Number(r.amount||0),0));
- const todays=valid.filter(r=>r.date===t).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
- $('homeSchedule').innerHTML=todays.length?todays.map(r=>`<div class="quote-line"><div><b>${esc(r.time||'시간미정')} · ${esc(r.customer)}</b><br><small>${esc(r.work||'-')} · ${esc(r.assignee)}</small></div><span class="money">${won(r.amount)}</span></div>`).join(''):'<div class="empty">오늘 예약이 없어요.</div>';
- const follows=db.partners.filter(p=>p.follow===t);
- $('homeFollowups').innerHTML=follows.length?follows.map(p=>`<div class="quote-line"><div><b>${esc(p.name)}</b><br><small>${esc(p.status)} · ${esc(p.phone||'')}</small></div><span>📞</span></div>`).join(''):'<div class="empty">오늘 재연락 일정이 없어요.</div>';
-}
-function resetReservationForm(){
- ['rId','rTime','rCustomer','rPhone','rAddress','rWork','rMemo'].forEach(id=>$(id).value='');
- $('rDate').value=today();$('rAssignee').value=currentUser?.name==='실장'?'실장':'대표';$('rStatus').value='예약접수';$('rCustomerType').value='일반고객';$('rPartner').value='';$('rAmount').value='';$('rPayment').value='미결제'
-}
-async function saveReservation(){
- if(!$('rDate').value||!$('rCustomer').value.trim()){alert('예약일과 고객명을 입력해주세요.');return}
- const id=$('rId').value;
- const row={date:$('rDate').value,time:$('rTime').value||null,customer:$('rCustomer').value.trim(),phone:$('rPhone').value.trim(),address:$('rAddress').value.trim(),assignee:$('rAssignee').value,status:$('rStatus').value,customer_type:$('rCustomerType').value,partner_id:$('rPartner').value?Number($('rPartner').value):null,amount:Number($('rAmount').value)||0,payment:$('rPayment').value,work:$('rWork').value.trim(),memo:$('rMemo').value.trim()};
- const q=id?supabaseClient.from('reservations').update(row).eq('id',Number(id)):supabaseClient.from('reservations').insert(row);
- const {error}=await q;if(error){alert('저장 실패: '+error.message);return}await loadCloudData();resetReservationForm();alert('저장했어요.')
-}
-function editReservation(id){
- const r=db.reservations.find(x=>x.id===id);if(!r)return;
- Object.entries({rId:r.id,rDate:r.date,rTime:r.time,rCustomer:r.customer,rPhone:r.phone,rAddress:r.address,rAssignee:r.assignee,rStatus:r.status,rCustomerType:r.customerType,rPartner:r.partnerId||'',rAmount:r.amount,rPayment:r.payment,rWork:r.work,rMemo:r.memo}).forEach(([k,v])=>$(k).value=v??'');
- window.scrollTo({top:0,behavior:'smooth'})
-}
-async function deleteReservation(id){if(confirm('이 예약을 삭제할까요?')){const {error}=await supabaseClient.from('reservations').delete().eq('id',Number(id));if(error)alert('삭제 실패: '+error.message);else await loadCloudData()}}
-function renderReservations(){
- let arr=[...db.reservations].sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
- if(currentUser?.role==='field') arr=arr.filter(r=>r.assignee==='실장');
- $('reservationRows').innerHTML=arr.length?arr.map(r=>`<tr><td>${esc(r.date)} ${esc(r.time||'')}</td><td><b>${esc(r.customer)}</b><br><small>${esc(r.phone||'')}</small></td><td>${esc(r.work||'-')}</td><td>${esc(r.assignee)}</td><td><span class="badge ${r.status==='작업완료'?'done':r.status==='취소'?'cancel':''}">${esc(r.status)}</span></td><td class="money">${won(r.amount)}</td><td>${esc(r.payment)}</td><td><div class="actions"><button class="btn ghost" onclick="editReservation('${r.id}')">수정</button><button class="btn danger admin-only" onclick="deleteReservation('${r.id}')">삭제</button></div></td></tr>`).join(''):'<tr><td colspan="8" class="empty">등록된 예약이 없어요.</td></tr>';
- if(currentUser?.role!=='admin')document.querySelectorAll('#reservationRows .admin-only').forEach(x=>x.style.display='none')
-}
-function refreshQuoteOptions(){
- const items=[...new Set(PRICE_ROWS.map(r=>r[0]))];
- $('qItem').innerHTML=items.map(x=>`<option>${esc(x)}</option>`).join('');
- const updateVariants=()=>{const item=$('qItem').value;$('qVariant').innerHTML=PRICE_ROWS.filter(r=>r[0]===item).map(r=>`<option>${esc(r[1])}</option>`).join('')};
- $('qItem').onchange=updateVariants;updateVariants()
-}
-function addQuoteLine(){
- const item=$('qItem').value,v=$('qVariant').value,w=$('qWork').value,qty=Math.max(1,Number($('qQty').value)||1);
- const row=PRICE_ROWS.find(r=>r[0]===item&&r[1]===v);if(!row)return;
- const idx={이전:2,재설치:3,철거:4}[w],unit=row[idx];
- quoteLines.push({id:uid(),item,variant:v,work:w,qty,unit,total:unit*qty});renderQuote()
-}
-function renderQuote(){
- $('quoteLines').innerHTML=quoteLines.length?quoteLines.map(x=>`<div class="quote-line"><div><b>${esc(x.item)} · ${esc(x.variant)}</b><br><small>${esc(x.work)} × ${x.qty}</small></div><span class="money">${won(x.total)}</span><button class="btn danger" onclick="removeQuoteLine('${x.id}')">삭제</button></div>`).join(''):'<div class="empty">품목을 추가해주세요.</div>';
- const sub=quoteLines.reduce((s,x)=>s+x.total,0),extra=Number($('qExtra').value)||0,lad=Number($('qLadder').value)||0,sky=Number($('qSky').value)||0,disc=Number($('qDiscount').value)||0;
- $('qSubtotal').textContent=won(sub);$('qExtras').textContent=won(extra+lad+sky-disc);$('qTotal').textContent=won(Math.max(0,sub+extra+lad+sky-disc))
-}
-function removeQuoteLine(id){quoteLines=quoteLines.filter(x=>x.id!==id);renderQuote()}
-function clearQuote(){quoteLines=[];['qExtra','qLadder','qSky','qDiscount'].forEach(x=>$(x).value=0);renderQuote()}
-function quoteTotal(){
- const sub=quoteLines.reduce((s,x)=>s+x.total,0);return Math.max(0,sub+(Number($('qExtra').value)||0)+(Number($('qLadder').value)||0)+(Number($('qSky').value)||0)-(Number($('qDiscount').value)||0))
-}
-function copyQuote(){
- const lines=quoteLines.map(x=>`${x.item} ${x.variant} / ${x.work} x${x.qty} : ${won(x.total)}`).join('\n');
- const txt=`[YEIL 견적안내]\n${lines}\n추가작업: ${won($('qExtra').value)}\n사다리: ${won($('qLadder').value)}\n스카이: ${won($('qSky').value)}\n할인: -${won($('qDiscount').value)}\n\n최종 견적: ${won(quoteTotal())}`;
- navigator.clipboard?.writeText(txt).then(()=>alert('견적 내용을 복사했어요.')).catch(()=>prompt('아래 내용을 복사해주세요.',txt))
-}
-function useQuoteForReservation(){
- $('rAmount').value=quoteTotal();$('rWork').value=quoteLines.map(x=>`${x.item} ${x.variant} ${x.work}`).join(' / ');
- document.querySelector('[data-page="reservation"]').click()
-}
-async function addCost(){
- if(!$('cDate').value||!Number($('cAmount').value)){alert('날짜와 금액을 입력해주세요.');return}
- const {error}=await supabaseClient.from('costs').insert({date:$('cDate').value,type:$('cType').value,amount:Number($('cAmount').value),memo:$('cMemo').value.trim()});
- if(error){alert('비용 저장 실패: '+error.message);return}$('cAmount').value='';$('cMemo').value='';await loadCloudData()
-}
-async function deleteCost(id){if(confirm('비용 내역을 삭제할까요?')){const {error}=await supabaseClient.from('costs').delete().eq('id',Number(id));if(error)alert('삭제 실패: '+error.message);else await loadCloudData()}}
-function renderSettlement(){
- const m=month(),done=db.reservations.filter(r=>r.status==='작업완료'&&r.date.startsWith(m)),revenue=done.reduce((s,r)=>s+Number(r.amount||0),0),costs=db.costs.filter(c=>c.date.startsWith(m)),cost=costs.reduce((s,c)=>s+Number(c.amount||0),0),unpaid=done.filter(r=>r.payment!=='결제완료').reduce((s,r)=>s+Number(r.amount||0),0);
- $('sRevenue').textContent=won(revenue);$('sCost').textContent=won(cost);$('sProfit').textContent=won(revenue-cost);$('sUnpaid').textContent=won(unpaid);
- $('costList').innerHTML=costs.length?[...costs].reverse().slice(0,10).map(c=>`<div class="quote-line"><div><b>${esc(c.type)}</b><br><small>${esc(c.date)} · ${esc(c.memo||'')}</small></div><span class="money">${won(c.amount)}</span><button class="btn danger" onclick="deleteCost('${c.id}')">삭제</button></div>`).join(''):'<div class="empty">등록된 비용이 없어요.</div>'
-}
-function resetPartner(){['pId','pName','pContact','pPhone','pArea','pMemo','pFollow'].forEach(id=>$(id).value='');$('pType').value='이사업체';$('pStatus').value='영업대상'}
-async function savePartner(){
- if(!$('pName').value.trim()){alert('업체명을 입력해주세요.');return}
- const id=$('pId').value,row={name:$('pName').value.trim(),type:$('pType').value,contact:$('pContact').value.trim(),phone:$('pPhone').value.trim(),area:$('pArea').value.trim(),status:$('pStatus').value,follow:$('pFollow').value||null,memo:$('pMemo').value.trim()};
- const q=id?supabaseClient.from('partners').update(row).eq('id',Number(id)):supabaseClient.from('partners').insert(row);
- const {error}=await q;if(error){alert('거래처 저장 실패: '+error.message);return}await loadCloudData();resetPartner()
-}
-function editPartner(id){const p=db.partners.find(x=>x.id===id);if(!p)return;Object.entries({pId:p.id,pName:p.name,pType:p.type,pContact:p.contact,pPhone:p.phone,pArea:p.area,pStatus:p.status,pFollow:p.follow,pMemo:p.memo}).forEach(([k,v])=>$(k).value=v??'')}
-async function deletePartner(id){if(confirm('거래처를 삭제할까요?')){const {error}=await supabaseClient.from('partners').delete().eq('id',Number(id));if(error)alert('삭제 실패: '+error.message);else await loadCloudData()}}
-function renderPartners(){
- $('partnerCards').innerHTML=db.partners.length?db.partners.map(p=>`<div class="quote-line"><div><b>${esc(p.name)}</b><br><small>${esc(p.type)} · ${esc(p.status)} · 다음연락 ${esc(p.follow||'-')}</small></div><div class="actions"><button class="btn ghost" onclick="editPartner('${p.id}')">수정</button><button class="btn danger" onclick="deletePartner('${p.id}')">삭제</button></div></div>`).join(''):'<div class="empty">등록된 거래처가 없어요.</div>';
- const stages=['영업대상','첫 연락','관심','단가표 전달','협의중','거래중','휴면'];
- $('salesPipeline').innerHTML=stages.map(s=>`<div class="card"><h3>${s}</h3>${db.partners.filter(p=>p.status===s).map(p=>`<div style="padding:7px 0;border-bottom:1px solid #222"><b>${esc(p.name)}</b><br><small style="color:#888">${esc(p.phone||'')}</small></div>`).join('')||'<div class="empty">0곳</div>'}</div>`).join('')
-}
-function refreshPartnerSelect(){const cur=$('rPartner')?.value||'';$('rPartner').innerHTML='<option value="">없음</option>'+db.partners.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');$('rPartner').value=cur}
-function renderAnalytics(){
- const m=month(),done=db.reservations.filter(r=>r.status==='작업완료'&&r.date.startsWith(m)),sum=done.reduce((s,r)=>s+Number(r.amount||0),0);
- $('aJobs').textContent=done.length+'건';$('aAvg').textContent=won(done.length?Math.round(sum/done.length):0);$('aPartnerJobs').textContent=done.filter(r=>r.customerType==='거래처').length+'건';$('aRetailJobs').textContent=done.filter(r=>r.customerType!=='거래처').length+'건';
- const people=['대표','총괄이사','실장'];$('assigneeStats').innerHTML=people.map(n=>`<div class="summary row"><span>${n}</span><b>${done.filter(r=>r.assignee===n).length}건</b></div>`).join('');
- const ps=db.partners.map(p=>({name:p.name,count:done.filter(r=>r.partnerId===p.id).length,sales:done.filter(r=>r.partnerId===p.id).reduce((s,r)=>s+Number(r.amount||0),0)})).sort((a,b)=>b.sales-a.sales).slice(0,5);
- $('partnerStats').innerHTML=ps.length?ps.map(p=>`<div class="summary row"><span>${esc(p.name)} (${p.count}건)</span><b class="money">${won(p.sales)}</b></div>`).join(''):'<div class="empty">거래처 실적이 없어요.</div>'
-}
-function renderPrices(){$('priceRows').innerHTML=PRICE_ROWS.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td class="money">${won(r[2])}</td><td class="money">${won(r[3])}</td><td class="money">${won(r[4])}</td></tr>`).join('')}
-function renderAccounts(){$('accountList').innerHTML=currentUser?`<div class="quote-line"><div><b>${esc(currentUser.name)}</b><br><small>${esc(currentUser.email||'')}</small></div><span class="badge">${currentUser.role==='admin'?'관리자':'현장'}</span></div>`:''}
-async function restoreSession(){
- if(!initSupabase())return;
- const {data}=await supabaseClient.auth.getSession();const user=data.session?.user;if(!user)return;
- const {data:profile}=await supabaseClient.from('staff_profiles').select('title,role').eq('user_id',user.id).single();
- if(!profile)return;currentUser={id:user.id,email:user.email,name:profile.title,role:profile.role};await loadCloudData();showApp();subscribeRealtime();
-}
-restoreSession();
+function subscribe(){if(realtimeChannel)client.removeChannel(realtimeChannel);realtimeChannel=client.channel("yeil-live").on("postgres_changes",{event:"*",schema:"public",table:"reservations"},()=>loadData()).on("postgres_changes",{event:"*",schema:"public",table:"partners"},()=>loadData()).on("postgres_changes",{event:"*",schema:"public",table:"costs"},()=>loadData()).subscribe()}
+function showApp(){$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("userChip").textContent=currentUser.name;$("todayLabel").textContent=new Intl.DateTimeFormat("ko-KR",{dateStyle:"full",timeZone:"Asia/Seoul"}).format(new Date());$("accountInfo").innerHTML="<b>"+esc(currentUser.name)+"</b><br><span class='muted'>"+esc(currentUser.email)+" · "+esc(currentUser.role)+"</span>";resetReservation();$("cDate").value=today();initQuote();renderAll()}
+function renderAll(){renderHome();renderReservations();renderSettlement();renderPartners();renderAnalytics();refreshPartnerSelect()}
+function renderHome(){const t=today(),m=month(),v=db.reservations.filter(x=>x.status!=="취소"),mt=v.filter(x=>x.date?.startsWith(m)),done=mt.filter(x=>x.status==="작업완료");$("kToday").textContent=v.filter(x=>x.date===t).length+"건";$("kDone").textContent=done.length+"건";$("kSales").textContent=won(done.reduce((s,x)=>s+Number(x.amount||0),0));$("kUnpaid").textContent=won(mt.filter(x=>x.payment!=="결제완료").reduce((s,x)=>s+Number(x.amount||0),0));const ts=v.filter(x=>x.date===t);$("homeSchedule").innerHTML=ts.length?ts.map(x=>`<div class="quote-line"><div><b>${esc(x.time||"시간미정")} · ${esc(x.customer)}</b><div class="muted">${esc(x.work||"")}</div></div><span class="money">${won(x.amount)}</span></div>`).join(""):"<div class='muted'>오늘 예약이 없어요.</div>";const f=db.partners.filter(x=>x.follow===t);$("homeFollowups").innerHTML=f.length?f.map(x=>`<div class="quote-line"><div><b>${esc(x.name)}</b><div class="muted">${esc(x.phone||"")}</div></div></div>`).join(""):"<div class='muted'>오늘 연락 일정이 없어요.</div>"}
+function resetReservation(){["rId","rTime","rCustomer","rPhone","rAddress","rWork","rMemo"].forEach(x=>$(x).value="");$("rDate").value=today();$("rAssignee").value=currentUser?.name==="실장"?"실장":"대표";$("rStatus").value="예약접수";$("rCustomerType").value="일반고객";$("rAmount").value="";$("rPayment").value="미결제"}
+async function saveReservation(){try{if(!$("rCustomer").value.trim())throw new Error("고객명을 입력해주세요.");const id=$("rId").value,row={date:$("rDate").value,time:$("rTime").value||null,customer:$("rCustomer").value.trim(),phone:$("rPhone").value.trim(),address:$("rAddress").value.trim(),assignee:$("rAssignee").value,status:$("rStatus").value,customer_type:$("rCustomerType").value,partner_id:$("rPartner").value?Number($("rPartner").value):null,amount:Number($("rAmount").value)||0,payment:$("rPayment").value,work:$("rWork").value.trim(),memo:$("rMemo").value.trim()};const q=id?client.from("reservations").update(row).eq("id",Number(id)):client.from("reservations").insert(row);const {error}=await q;if(error)throw error;await loadData();resetReservation();alert("저장했어요.")}catch(e){alert("저장 실패: "+(e.message||e))}}
+function editReservation(id){const x=db.reservations.find(r=>String(r.id)===String(id));if(!x)return;const m={rId:x.id,rDate:x.date,rTime:x.time,rCustomer:x.customer,rPhone:x.phone,rAddress:x.address,rAssignee:x.assignee,rStatus:x.status,rCustomerType:x.customerType,rPartner:x.partnerId||"",rAmount:x.amount,rPayment:x.payment,rWork:x.work,rMemo:x.memo};Object.entries(m).forEach(([k,v])=>$(k).value=v??"");window.scrollTo({top:0,behavior:"smooth"})}
+async function deleteReservation(id){if(!confirm("이 예약을 삭제할까요?"))return;const {error}=await client.from("reservations").delete().eq("id",Number(id));if(error)alert("삭제 실패: "+error.message);else await loadData()}
+function renderReservations(){let a=[...db.reservations];if(currentUser?.role==="field")a=a.filter(x=>x.assignee==="실장");$("reservationRows").innerHTML=a.length?a.map(x=>`<tr><td>${esc(x.date)} ${esc(x.time||"")}</td><td>${esc(x.customer)}<br><span class="muted">${esc(x.phone||"")}</span></td><td>${esc(x.work||"")}</td><td>${esc(x.assignee||"")}</td><td>${esc(x.status||"")}</td><td class="money">${won(x.amount)}</td><td>${esc(x.payment||"")}</td><td><div class="actions"><button class="btn ghost" data-edit-res="${x.id}">수정</button><button class="btn danger" data-del-res="${x.id}">삭제</button></div></td></tr>`).join(""):"<tr><td colspan='8'>등록된 예약이 없어요.</td></tr>";document.querySelectorAll("[data-edit-res]").forEach(b=>b.onclick=()=>editReservation(b.dataset.editRes));document.querySelectorAll("[data-del-res]").forEach(b=>b.onclick=()=>deleteReservation(b.dataset.delRes))}
+function initQuote(){const items=[...new Set(PRICE_ROWS.map(x=>x[0]))];$("qItem").innerHTML=items.map(x=>`<option>${esc(x)}</option>`).join("");updateVariants();renderQuote()}
+function updateVariants(){$("qVariant").innerHTML=PRICE_ROWS.filter(x=>x[0]===$("qItem").value).map(x=>`<option>${esc(x[1])}</option>`).join("")}
+function addQuote(){const row=PRICE_ROWS.find(x=>x[0]===$("qItem").value&&x[1]===$("qVariant").value);if(!row)return;const idx={이전:2,재설치:3,철거:4}[$("qWork").value],qty=Math.max(1,Number($("qQty").value)||1);quoteLines.push({id:uid(),item:row[0],variant:row[1],work:$("qWork").value,qty,total:row[idx]*qty});renderQuote()}
+function quoteTotal(){return Math.max(0,quoteLines.reduce((s,x)=>s+x.total,0)+(Number($("qExtra").value)||0)+(Number($("qLadder").value)||0)+(Number($("qSky").value)||0)-(Number($("qDiscount").value)||0))}
+function renderQuote(){$("quoteLines").innerHTML=quoteLines.length?quoteLines.map(x=>`<div class="quote-line"><div><b>${esc(x.item)} · ${esc(x.variant)}</b><div class="muted">${esc(x.work)} × ${x.qty}</div></div><span class="money">${won(x.total)}</span><button class="btn danger" data-del-q="${x.id}">삭제</button></div>`).join(""):"<div class='muted'>품목을 추가해주세요.</div>";$("qTotal").textContent=won(quoteTotal());document.querySelectorAll("[data-del-q]").forEach(b=>b.onclick=()=>{quoteLines=quoteLines.filter(x=>x.id!==b.dataset.delQ);renderQuote()})}
+function copyQuote(){const txt="[YEIL 견적안내]\\n"+quoteLines.map(x=>`${x.item} ${x.variant} / ${x.work} x${x.qty} : ${won(x.total)}`).join("\\n")+`\\n추가작업: ${won($("qExtra").value)}\\n사다리: ${won($("qLadder").value)}\\n스카이: ${won($("qSky").value)}\\n할인: -${won($("qDiscount").value)}\\n\\n최종 견적: ${won(quoteTotal())}`;navigator.clipboard?.writeText(txt).then(()=>alert("견적 내용을 복사했어요.")).catch(()=>prompt("아래 내용을 복사해주세요.",txt))}
+function useQuote(){$("rAmount").value=quoteTotal();$("rWork").value=quoteLines.map(x=>`${x.item} ${x.variant} ${x.work}`).join(" / ");goPage("reservation")}
+async function saveCost(){if(!Number($("cAmount").value)){alert("금액을 입력해주세요.");return}const {error}=await client.from("costs").insert({date:$("cDate").value,type:$("cType").value,amount:Number($("cAmount").value),memo:$("cMemo").value.trim()});if(error)alert("비용 저장 실패: "+error.message);else{$("cAmount").value="";$("cMemo").value="";await loadData()}}
+async function deleteCost(id){if(!confirm("비용 내역을 삭제할까요?"))return;const {error}=await client.from("costs").delete().eq("id",Number(id));if(error)alert(error.message);else await loadData()}
+function renderSettlement(){const m=month(),d=db.reservations.filter(x=>x.status==="작업완료"&&x.date?.startsWith(m)),rev=d.reduce((s,x)=>s+Number(x.amount||0),0),cs=db.costs.filter(x=>x.date?.startsWith(m)),cost=cs.reduce((s,x)=>s+Number(x.amount||0),0),un=d.filter(x=>x.payment!=="결제완료").reduce((s,x)=>s+Number(x.amount||0),0);$("sRevenue").textContent=won(rev);$("sCost").textContent=won(cost);$("sProfit").textContent=won(rev-cost);$("sUnpaid").textContent=won(un);$("costList").innerHTML=cs.length?cs.map(x=>`<div class="quote-line"><div><b>${esc(x.type)}</b><div class="muted">${esc(x.date)} · ${esc(x.memo||"")}</div></div><span class="money">${won(x.amount)}</span><button class="btn danger" data-del-cost="${x.id}">삭제</button></div>`).join(""):"<div class='muted'>등록된 비용이 없어요.</div>";document.querySelectorAll("[data-del-cost]").forEach(b=>b.onclick=()=>deleteCost(b.dataset.delCost))}
+function resetPartner(){["pId","pName","pContact","pPhone","pArea","pMemo","pFollow"].forEach(x=>$(x).value="");$("pType").value="이사업체";$("pStatus").value="영업대상"}
+async function savePartner(){if(!$("pName").value.trim()){alert("업체명을 입력해주세요.");return}const id=$("pId").value,row={name:$("pName").value.trim(),type:$("pType").value,contact:$("pContact").value.trim(),phone:$("pPhone").value.trim(),area:$("pArea").value.trim(),status:$("pStatus").value,follow:$("pFollow").value||null,memo:$("pMemo").value.trim()};const q=id?client.from("partners").update(row).eq("id",Number(id)):client.from("partners").insert(row);const {error}=await q;if(error)alert("거래처 저장 실패: "+error.message);else{await loadData();resetPartner()}}
+function editPartner(id){const x=db.partners.find(p=>String(p.id)===String(id));if(!x)return;const m={pId:x.id,pName:x.name,pType:x.type,pContact:x.contact,pPhone:x.phone,pArea:x.area,pStatus:x.status,pFollow:x.follow,pMemo:x.memo};Object.entries(m).forEach(([k,v])=>$(k).value=v??"")}
+async function deletePartner(id){if(!confirm("거래처를 삭제할까요?"))return;const {error}=await client.from("partners").delete().eq("id",Number(id));if(error)alert(error.message);else await loadData()}
+function renderPartners(){$("partnerCards").innerHTML=db.partners.length?db.partners.map(x=>`<div class="quote-line"><div><b>${esc(x.name)}</b><div class="muted">${esc(x.type)} · ${esc(x.status)} · ${esc(x.phone||"")}</div></div><div class="actions"><button class="btn ghost" data-edit-p="${x.id}">수정</button><button class="btn danger" data-del-p="${x.id}">삭제</button></div></div>`).join(""):"<div class='muted'>등록된 거래처가 없어요.</div>";document.querySelectorAll("[data-edit-p]").forEach(b=>b.onclick=()=>editPartner(b.dataset.editP));document.querySelectorAll("[data-del-p]").forEach(b=>b.onclick=()=>deletePartner(b.dataset.delP))}
+function refreshPartnerSelect(){const cur=$("rPartner").value;$("rPartner").innerHTML="<option value=''>없음</option>"+db.partners.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join("");$("rPartner").value=cur}
+function renderAnalytics(){const m=month(),d=db.reservations.filter(x=>x.status==="작업완료"&&x.date?.startsWith(m)),sum=d.reduce((s,x)=>s+Number(x.amount||0),0);$("aJobs").textContent=d.length+"건";$("aAvg").textContent=won(d.length?Math.round(sum/d.length):0);$("aPartnerJobs").textContent=d.filter(x=>x.customerType==="거래처").length+"건";$("aRetailJobs").textContent=d.filter(x=>x.customerType!=="거래처").length+"건"}
+function goPage(id){document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===id));$("pageTitle").textContent=document.querySelector(`.nav button[data-page="${id}"]`)?.textContent.replace(/^[^ ]+ /,"")||id;$("sidebar").classList.remove("open");renderAll()}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>goPage(b.dataset.page));
+$("menuBtn").onclick=()=>$("sidebar").classList.toggle("open");$("logoutBtn").onclick=logout;$("loginBtn").onclick=login;$("configBtn").onclick=configure;$("checkBtn").onclick=checkConnection;$("reconfigBtn").onclick=configure;
+$("newResBtn").onclick=resetReservation;$("resetResBtn").onclick=resetReservation;$("saveResBtn").onclick=saveReservation;
+$("qItem").onchange=updateVariants;$("addQuoteBtn").onclick=addQuote;["qExtra","qLadder","qSky","qDiscount"].forEach(id=>$(id).oninput=renderQuote);$("copyQuoteBtn").onclick=copyQuote;$("useQuoteBtn").onclick=useQuote;$("clearQuoteBtn").onclick=()=>{quoteLines=[];renderQuote()};
+$("saveCostBtn").onclick=saveCost;$("savePartnerBtn").onclick=savePartner;$("resetPartnerBtn").onclick=resetPartner;
+restore();
 </script>
 </body>
 </html>
