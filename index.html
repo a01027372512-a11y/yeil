@@ -175,19 +175,141 @@ async function restore(){
 }
 async function logout(){if(client)await client.auth.signOut();location.reload()}
 async function loadData(){
- const [r,p,c]=await Promise.all([client.from("reservations").select("*").order("date",{ascending:false}),client.from("partners").select("*").order("created_at",{ascending:false}),client.from("costs").select("*").order("date",{ascending:false})]);
+ if(currentUser?.role==="field"){
+  const r=await client.from("reservations").select("*").order("date",{ascending:false});
+  if(r.error)throw r.error;
+  db.reservations=(r.data||[]).map(x=>({...x,customerType:x.customer_type,partnerId:x.partner_id}));
+  db.partners=[];db.costs=[];
+  renderAll();
+  return;
+ }
+ const [r,p,c]=await Promise.all([
+  client.from("reservations").select("*").order("date",{ascending:false}),
+  client.from("partners").select("*").order("created_at",{ascending:false}),
+  client.from("costs").select("*").order("date",{ascending:false})
+ ]);
  const e=r.error||p.error||c.error;if(e)throw e;
- db.reservations=(r.data||[]).map(x=>({...x,customerType:x.customer_type,partnerId:x.partner_id}));db.partners=p.data||[];db.costs=c.data||[];renderAll();
+ db.reservations=(r.data||[]).map(x=>({...x,customerType:x.customer_type,partnerId:x.partner_id}));
+ db.partners=p.data||[];db.costs=c.data||[];
+ renderAll();
 }
-function subscribe(){if(realtimeChannel)client.removeChannel(realtimeChannel);realtimeChannel=client.channel("yeil-live").on("postgres_changes",{event:"*",schema:"public",table:"reservations"},()=>loadData()).on("postgres_changes",{event:"*",schema:"public",table:"partners"},()=>loadData()).on("postgres_changes",{event:"*",schema:"public",table:"costs"},()=>loadData()).subscribe()}
-function showApp(){$("loginView").classList.add("hidden");$("appView").classList.remove("hidden");$("userChip").textContent=currentUser.name;$("todayLabel").textContent=new Intl.DateTimeFormat("ko-KR",{dateStyle:"full",timeZone:"Asia/Seoul"}).format(new Date());$("accountInfo").innerHTML="<b>"+esc(currentUser.name)+"</b><br><span class='muted'>"+esc(currentUser.email)+" · "+esc(currentUser.role)+"</span>";resetReservation();$("cDate").value=today();initQuote();renderAll()}
-function renderAll(){renderHome();renderReservations();renderSettlement();renderPartners();renderAnalytics();refreshPartnerSelect()}
+function subscribe(){
+ if(realtimeChannel)client.removeChannel(realtimeChannel);
+ realtimeChannel=client.channel("yeil-live")
+  .on("postgres_changes",{event:"*",schema:"public",table:"reservations"},()=>loadData());
+ if(currentUser?.role!=="field"){
+  realtimeChannel
+   .on("postgres_changes",{event:"*",schema:"public",table:"partners"},()=>loadData())
+   .on("postgres_changes",{event:"*",schema:"public",table:"costs"},()=>loadData());
+ }
+ realtimeChannel.subscribe();
+}
+
+function isField(){return currentUser?.role==="field"}
+
+function applyRoleAccess(){
+ if(!isField())return;
+ const allowed=["reservation","quote"];
+ document.querySelectorAll(".nav button").forEach(btn=>{
+  btn.style.display=allowed.includes(btn.dataset.page)?"":"none";
+ });
+ ["rAmount","rPayment","rCustomerType","rPartner"].forEach(id=>{
+  const el=$(id);
+  if(el){
+   const wrap=el.closest("div");
+   if(wrap)wrap.style.display="none";
+  }
+ });
+}
+function showApp(){
+ $("loginView").classList.add("hidden");
+ $("appView").classList.remove("hidden");
+ $("userChip").textContent=currentUser.name;
+ $("todayLabel").textContent=new Intl.DateTimeFormat("ko-KR",{dateStyle:"full",timeZone:"Asia/Seoul"}).format(new Date());
+ $("accountInfo").innerHTML="<b>"+esc(currentUser.name)+"</b><br><span class='muted'>"+esc(currentUser.email)+" · "+esc(currentUser.role)+"</span>";
+ resetReservation();
+ $("cDate").value=today();
+ initQuote();
+ renderAll();
+ if(isField()){
+  applyRoleAccess();
+  goPage("reservation");
+ }
+}
+function renderAll(){
+ renderReservations();
+ if(!isField()){
+  renderHome();
+  renderSettlement();
+  renderPartners();
+  renderAnalytics();
+  refreshPartnerSelect();
+ }
+}
 function renderHome(){const t=today(),m=month(),v=db.reservations.filter(x=>x.status!=="취소"),mt=v.filter(x=>x.date?.startsWith(m)),done=mt.filter(x=>x.status==="작업완료");$("kToday").textContent=v.filter(x=>x.date===t).length+"건";$("kDone").textContent=done.length+"건";$("kSales").textContent=won(done.reduce((s,x)=>s+Number(x.amount||0),0));$("kUnpaid").textContent=won(mt.filter(x=>x.payment!=="결제완료").reduce((s,x)=>s+Number(x.amount||0),0));const ts=v.filter(x=>x.date===t);$("homeSchedule").innerHTML=ts.length?ts.map(x=>`<div class="quote-line"><div><b>${esc(x.time||"시간미정")} · ${esc(x.customer)}</b><div class="muted">${esc(x.work||"")}</div></div><span class="money">${won(x.amount)}</span></div>`).join(""):"<div class='muted'>오늘 예약이 없어요.</div>";const f=db.partners.filter(x=>x.follow===t);$("homeFollowups").innerHTML=f.length?f.map(x=>`<div class="quote-line"><div><b>${esc(x.name)}</b><div class="muted">${esc(x.phone||"")}</div></div></div>`).join(""):"<div class='muted'>오늘 연락 일정이 없어요.</div>"}
 function resetReservation(){["rId","rTime","rCustomer","rPhone","rAddress","rWork","rMemo"].forEach(x=>$(x).value="");$("rDate").value=today();$("rAssignee").value=currentUser?.name==="실장"?"실장":"대표";$("rStatus").value="예약접수";$("rCustomerType").value="일반고객";$("rAmount").value="";$("rPayment").value="미결제"}
-async function saveReservation(){try{if(!$("rCustomer").value.trim())throw new Error("고객명을 입력해주세요.");const id=$("rId").value,row={date:$("rDate").value,time:$("rTime").value||null,customer:$("rCustomer").value.trim(),phone:$("rPhone").value.trim(),address:$("rAddress").value.trim(),assignee:$("rAssignee").value,status:$("rStatus").value,customer_type:$("rCustomerType").value,partner_id:$("rPartner").value?Number($("rPartner").value):null,amount:Number($("rAmount").value)||0,payment:$("rPayment").value,work:$("rWork").value.trim(),memo:$("rMemo").value.trim()};const q=id?client.from("reservations").update(row).eq("id",Number(id)):client.from("reservations").insert(row);const {error}=await q;if(error)throw error;await loadData();resetReservation();alert("저장했어요.")}catch(e){alert("저장 실패: "+(e.message||e))}}
+async function saveReservation(){
+ try{
+  if(!$("rCustomer").value.trim())throw new Error("고객명을 입력해주세요.");
+  const id=$("rId").value;
+  const existing=id?db.reservations.find(r=>String(r.id)===String(id)):null;
+  const row={
+   date:$("rDate").value,
+   time:$("rTime").value||null,
+   customer:$("rCustomer").value.trim(),
+   phone:$("rPhone").value.trim(),
+   address:$("rAddress").value.trim(),
+   assignee:$("rAssignee").value,
+   status:$("rStatus").value,
+   work:$("rWork").value.trim(),
+   memo:$("rMemo").value.trim()
+  };
+  if(isField()){
+   if(existing){
+    row.customer_type=existing.customer_type||existing.customerType||"일반고객";
+    row.partner_id=existing.partner_id??existing.partnerId??null;
+    row.amount=Number(existing.amount)||0;
+    row.payment=existing.payment||"미결제";
+   }else{
+    row.customer_type="일반고객";
+    row.partner_id=null;
+    row.amount=0;
+    row.payment="미결제";
+   }
+  }else{
+   row.customer_type=$("rCustomerType").value;
+   row.partner_id=$("rPartner").value?Number($("rPartner").value):null;
+   row.amount=Number($("rAmount").value)||0;
+   row.payment=$("rPayment").value;
+  }
+  const q=id?client.from("reservations").update(row).eq("id",Number(id)):client.from("reservations").insert(row);
+  const {error}=await q;
+  if(error)throw error;
+  await loadData();
+  resetReservation();
+  alert("저장했어요.");
+ }catch(e){
+  alert("저장 실패: "+(e.message||e));
+ }
+}
 function editReservation(id){const x=db.reservations.find(r=>String(r.id)===String(id));if(!x)return;const m={rId:x.id,rDate:x.date,rTime:x.time,rCustomer:x.customer,rPhone:x.phone,rAddress:x.address,rAssignee:x.assignee,rStatus:x.status,rCustomerType:x.customerType,rPartner:x.partnerId||"",rAmount:x.amount,rPayment:x.payment,rWork:x.work,rMemo:x.memo};Object.entries(m).forEach(([k,v])=>$(k).value=v??"");window.scrollTo({top:0,behavior:"smooth"})}
 async function deleteReservation(id){if(!confirm("이 예약을 삭제할까요?"))return;const {error}=await client.from("reservations").delete().eq("id",Number(id));if(error)alert("삭제 실패: "+error.message);else await loadData()}
-function renderReservations(){let a=[...db.reservations];if(currentUser?.role==="field")a=a.filter(x=>x.assignee==="실장");$("reservationRows").innerHTML=a.length?a.map(x=>`<tr><td>${esc(x.date)} ${esc(x.time||"")}</td><td>${esc(x.customer)}<br><span class="muted">${esc(x.phone||"")}</span></td><td>${esc(x.work||"")}</td><td>${esc(x.assignee||"")}</td><td>${esc(x.status||"")}</td><td class="money">${won(x.amount)}</td><td>${esc(x.payment||"")}</td><td><div class="actions"><button class="btn ghost" data-edit-res="${x.id}">수정</button><button class="btn danger" data-del-res="${x.id}">삭제</button></div></td></tr>`).join(""):"<tr><td colspan='8'>등록된 예약이 없어요.</td></tr>";document.querySelectorAll("[data-edit-res]").forEach(b=>b.onclick=()=>editReservation(b.dataset.editRes));document.querySelectorAll("[data-del-res]").forEach(b=>b.onclick=()=>deleteReservation(b.dataset.delRes))}
+function renderReservations(){
+ let a=[...db.reservations];
+ if(isField())a=a.filter(x=>x.assignee==="실장");
+ const table=$("reservationRows")?.closest("table");
+ const head=table?.querySelector("thead tr");
+
+ if(isField()){
+  if(head)head.innerHTML="<th>일정</th><th>고객</th><th>작업</th><th>담당</th><th>상태</th><th>관리</th>";
+  $("reservationRows").innerHTML=a.length?a.map(x=>`<tr><td>${esc(x.date)} ${esc(x.time||"")}</td><td>${esc(x.customer)}<br><span class="muted">${esc(x.phone||"")}</span></td><td>${esc(x.work||"")}</td><td>${esc(x.assignee||"")}</td><td>${esc(x.status||"")}</td><td><div class="actions"><button class="btn ghost" data-edit-res="${x.id}">수정</button><button class="btn danger" data-del-res="${x.id}">삭제</button></div></td></tr>`).join(""):"<tr><td colspan='6'>등록된 예약이 없어요.</td></tr>";
+ }else{
+  if(head)head.innerHTML="<th>일정</th><th>고객</th><th>작업</th><th>담당</th><th>상태</th><th>금액</th><th>결제</th><th>관리</th>";
+  $("reservationRows").innerHTML=a.length?a.map(x=>`<tr><td>${esc(x.date)} ${esc(x.time||"")}</td><td>${esc(x.customer)}<br><span class="muted">${esc(x.phone||"")}</span></td><td>${esc(x.work||"")}</td><td>${esc(x.assignee||"")}</td><td>${esc(x.status||"")}</td><td class="money">${won(x.amount)}</td><td>${esc(x.payment||"")}</td><td><div class="actions"><button class="btn ghost" data-edit-res="${x.id}">수정</button><button class="btn danger" data-del-res="${x.id}">삭제</button></div></td></tr>`).join(""):"<tr><td colspan='8'>등록된 예약이 없어요.</td></tr>";
+ }
+ document.querySelectorAll("[data-edit-res]").forEach(b=>b.onclick=()=>editReservation(b.dataset.editRes));
+ document.querySelectorAll("[data-del-res]").forEach(b=>b.onclick=()=>deleteReservation(b.dataset.delRes));
+}
 function initQuote(){const items=[...new Set(PRICE_ROWS.map(x=>x[0]))];$("qItem").innerHTML=items.map(x=>`<option>${esc(x)}</option>`).join("");updateVariants();renderQuote()}
 function updateVariants(){$("qVariant").innerHTML=PRICE_ROWS.filter(x=>x[0]===$("qItem").value).map(x=>`<option>${esc(x[1])}</option>`).join("")}
 function addQuote(){const row=PRICE_ROWS.find(x=>x[0]===$("qItem").value&&x[1]===$("qVariant").value);if(!row)return;const idx={이전:2,재설치:3,철거:4}[$("qWork").value],qty=Math.max(1,Number($("qQty").value)||1);quoteLines.push({id:uid(),item:row[0],variant:row[1],work:$("qWork").value,qty,total:row[idx]*qty});renderQuote()}
@@ -205,7 +327,17 @@ async function deletePartner(id){if(!confirm("거래처를 삭제할까요?"))re
 function renderPartners(){$("partnerCards").innerHTML=db.partners.length?db.partners.map(x=>`<div class="quote-line"><div><b>${esc(x.name)}</b><div class="muted">${esc(x.type)} · ${esc(x.status)} · ${esc(x.phone||"")}</div></div><div class="actions"><button class="btn ghost" data-edit-p="${x.id}">수정</button><button class="btn danger" data-del-p="${x.id}">삭제</button></div></div>`).join(""):"<div class='muted'>등록된 거래처가 없어요.</div>";document.querySelectorAll("[data-edit-p]").forEach(b=>b.onclick=()=>editPartner(b.dataset.editP));document.querySelectorAll("[data-del-p]").forEach(b=>b.onclick=()=>deletePartner(b.dataset.delP))}
 function refreshPartnerSelect(){const cur=$("rPartner").value;$("rPartner").innerHTML="<option value=''>없음</option>"+db.partners.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join("");$("rPartner").value=cur}
 function renderAnalytics(){const m=month(),d=db.reservations.filter(x=>x.status==="작업완료"&&x.date?.startsWith(m)),sum=d.reduce((s,x)=>s+Number(x.amount||0),0);$("aJobs").textContent=d.length+"건";$("aAvg").textContent=won(d.length?Math.round(sum/d.length):0);$("aPartnerJobs").textContent=d.filter(x=>x.customerType==="거래처").length+"건";$("aRetailJobs").textContent=d.filter(x=>x.customerType!=="거래처").length+"건"}
-function goPage(id){document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));$(id).classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===id));$("pageTitle").textContent=document.querySelector(`.nav button[data-page="${id}"]`)?.textContent.replace(/^[^ ]+ /,"")||id;$("sidebar").classList.remove("open");renderAll()}
+function goPage(id){
+ if(isField() && !["reservation","quote"].includes(id))id="reservation";
+ document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
+ $(id).classList.add("active");
+ document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===id));
+ const navBtn=document.querySelector('.nav button[data-page="'+id+'"]');
+ $("pageTitle").textContent=navBtn?navBtn.textContent.replace(/^[^ ]+ /,""):id;
+ $("sidebar").classList.remove("open");
+ renderAll();
+ if(isField())applyRoleAccess();
+}
 document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>goPage(b.dataset.page));
 $("menuBtn").onclick=()=>$("sidebar").classList.toggle("open");$("logoutBtn").onclick=logout;$("loginBtn").onclick=login;$("configBtn").onclick=configure;$("checkBtn").onclick=checkConnection;$("reconfigBtn").onclick=configure;
 $("newResBtn").onclick=resetReservation;$("resetResBtn").onclick=resetReservation;$("saveResBtn").onclick=saveReservation;
