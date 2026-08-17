@@ -1,0 +1,10 @@
+{
+  "name": "YEIL Business Management",
+  "short_name": "YEIL",
+  "description": "YEIL 비즈니스 관리 시스템",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#080808"
+}
