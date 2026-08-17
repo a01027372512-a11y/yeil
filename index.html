@@ -80,7 +80,7 @@ th{color:#d2bd88;background:#12110f;position:sticky;top:0}.money{color:var(--gol
     <div class="field"><label>비밀번호</label><input id="loginPw" type="password" autocomplete="current-password" placeholder="비밀번호 입력"></div>
     <button class="btn primary" style="width:100%" onclick="login()">LOGIN</button>
     <div class="actions" style="margin-top:10px;justify-content:center">
-      <button class="btn ghost" type="button" onclick="resetPublishableKeyFromLogin()">연결키 다시 설정</button>
+      <button class="btn ghost" type="button" onclick="resetCloudConfigFromLogin()">Supabase 연결 다시 설정</button>
       <button class="btn ghost" type="button" onclick="testCloudConnection()">연결 상태 확인</button>
     </div>
     <div id="loginError" style="display:none;margin-top:12px;padding:12px;border:1px solid #5a2828;background:#1c1010;color:#f2a3a3;border-radius:12px;font-size:12px;line-height:1.6;white-space:pre-wrap"></div>
@@ -296,45 +296,114 @@ const PRICE_ROWS = [
  ['콤보 세탁기','기본',180000,100000,80000]
 ];
 
-const SUPABASE_URL='https://kqhbxtjjnqygvncfdes.supabase.co';
+const URL_STORE='yeil_supabase_project_url';
 const KEY_STORE='yeil_supabase_publishable_key';
 let supabaseClient=null;
-let db={reservations:[],partners:[],costs:[],quotes:[]};
-let currentUser=null, quoteLines=[];
-const $=id=>document.getElementById(id);
-const won=n=>(Number(n)||0).toLocaleString('ko-KR')+'원';
-const today=()=>new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Seoul'});
-const month=()=>today().slice(0,7);
-const uid=()=>String(Date.now())+Math.random().toString(36).slice(2,7);
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+let activeCloudSignature='';
 
+function cleanProjectUrl(v){
+  let x=String(v||'').trim().replace(/\/+$/,'');
+  x=x.replace(/\/rest\/v1$/,'');
+  return x;
+}
+function getProjectUrl(){return cleanProjectUrl(localStorage.getItem(URL_STORE)||'')}
 function getPublishableKey(){return localStorage.getItem(KEY_STORE)||''}
+
 function initSupabase(){
- const key=getPublishableKey();
- if(!key||!window.supabase){supabaseClient=null;return false}
- supabaseClient=window.supabase.createClient(SUPABASE_URL,key);return true
+  const url=getProjectUrl(), key=getPublishableKey();
+  if(!url || !key || !window.supabase)return false;
+  const sig=url+'|'+key;
+  if(supabaseClient && activeCloudSignature===sig)return true;
+  supabaseClient=window.supabase.createClient(url,key,{
+    auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+  });
+  activeCloudSignature=sig;
+  return true;
 }
-function updateConfigState(){
- const el=$('configState'); if(el)el.textContent=getPublishableKey()?'클라우드 연결키가 저장되어 있습니다.':'처음 한 번 Publishable key 설정이 필요합니다.';
- const inp=$('publishableKeyInput');if(inp)inp.value=getPublishableKey();
+
+function saveCloudConfig(url,key){
+  const u=cleanProjectUrl(url), k=String(key||'').trim();
+  if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(u)){
+    alert('Project URL 형식을 확인해주세요.\n예: https://xxxxxxxxxxxxxxxxxxxx.supabase.co');
+    return false;
+  }
+  if(!k.startsWith('sb_publishable_')){
+    alert('Publishable key 형식을 확인해주세요.\nsb_publishable_... 로 시작해야 합니다.');
+    return false;
+  }
+  localStorage.setItem(URL_STORE,u);
+  localStorage.setItem(KEY_STORE,k);
+  supabaseClient=null; activeCloudSignature='';
+  return initSupabase();
 }
-function saveCloudConfig(){
- const key=$('publishableKeyInput').value.trim();
- if(!key.startsWith('sb_publishable_')){alert('Publishable key(sb_publishable_...)를 입력해주세요. Secret key는 입력하면 안 됩니다.');return}
- localStorage.setItem(KEY_STORE,key);initSupabase();alert('연결키를 저장했어요. 다시 로그인해주세요.');logout();
+
+function resetCloudConfigFromLogin(){
+  const currentUrl=getProjectUrl();
+  const currentKey=getPublishableKey();
+  const url=prompt(
+    'Supabase Project URL을 입력해주세요.\nData API의 API URL에서 /rest/v1/ 을 제외한 주소입니다.',
+    currentUrl
+  );
+  if(url===null)return;
+  const key=prompt(
+    'Publishable key를 입력해주세요.\nSecret key가 아니라 sb_publishable_... 로 시작하는 값입니다.',
+    currentKey
+  );
+  if(key===null)return;
+  if(saveCloudConfig(url,key)){
+    alert('Supabase 연결 정보를 저장했어요.\n이제 「연결 상태 확인」을 눌러주세요.');
+  }
 }
-function clearCloudConfig(){if(confirm('이 브라우저에 저장된 Publishable key를 삭제할까요?')){localStorage.removeItem(KEY_STORE);location.reload()}}
+
+async function testCloudConnection(){
+  const box=$('loginError');
+  const show=(msg,ok=false)=>{
+    if(box){
+      box.style.display='block';
+      box.style.borderColor=ok?'#244934':'#5a2828';
+      box.style.background=ok?'#0e1812':'#1c1010';
+      box.style.color=ok?'#99d4b1':'#f2a3a3';
+      box.textContent=msg;
+    }
+  };
+  const url=getProjectUrl(), key=getPublishableKey();
+  if(!url || !key){
+    show('Supabase Project URL 또는 Publishable key가 없습니다.\n「Supabase 연결 다시 설정」을 눌러주세요.');
+    return;
+  }
+  try{
+    const r=await fetch(url+'/rest/v1/',{
+      method:'GET',
+      headers:{apikey:key,Authorization:'Bearer '+key}
+    });
+    if(r.status===200 || r.status===404){
+      initSupabase();
+      show('Supabase 서버 연결은 정상입니다.\nProject URL의 DNS 연결까지 확인됐어요.',true);
+    }else{
+      show('Supabase 서버에는 연결됐지만 응답 상태가 '+r.status+' 입니다.\nProject URL과 Publishable key를 다시 확인해주세요.');
+    }
+  }catch(e){
+    show('Supabase 서버에 연결하지 못했습니다.\n'+(e?.message||String(e))+
+         '\n\nProject URL을 Data API 화면에서 다시 복사해 입력해주세요.');
+  }
+}
+
+function clearCloudConfig(){
+  if(confirm('이 브라우저에 저장된 Supabase Project URL과 Publishable key를 삭제할까요?')){
+    localStorage.removeItem(URL_STORE);
+    localStorage.removeItem(KEY_STORE);
+    location.reload();
+  }
+}
+
 async function login(){
  const errBox=$('loginError');
  const showErr=(msg)=>{if(errBox){errBox.style.display='block';errBox.textContent=msg} alert(msg)};
  if(errBox){errBox.style.display='none';errBox.textContent=''}
  try{
    if(!initSupabase()){
-     const key=prompt('Supabase Publishable key를 입력해주세요.\n(sb_publishable_... 로 시작하는 키)');
-     if(!key)return;
-     if(!key.trim().startsWith('sb_publishable_')){showErr('Publishable key 형식을 확인해주세요.');return}
-     localStorage.setItem(KEY_STORE,key.trim());
-     if(!initSupabase()){showErr('Supabase 클라이언트를 시작하지 못했습니다. 인터넷 연결을 확인해주세요.');return}
+     showErr('Supabase 연결 정보가 없거나 올바르지 않습니다.\n「Supabase 연결 다시 설정」에서 Project URL과 Publishable key를 먼저 입력해주세요.');
+     return;
    }
    const email=$('loginId').value.trim();
    const password=$('loginPw').value;
@@ -359,28 +428,6 @@ async function login(){
  }
 }
 
-function resetPublishableKeyFromLogin(){
- const current=getPublishableKey();
- const key=prompt('Publishable key를 다시 입력해주세요.\\nSecret key가 아니라 sb_publishable_... 로 시작하는 값입니다.', current);
- if(key===null)return;
- const clean=key.trim();
- if(!clean.startsWith('sb_publishable_')){alert('Publishable key 형식을 확인해주세요.');return}
- localStorage.setItem(KEY_STORE,clean);
- initSupabase();
- alert('연결키를 다시 저장했어요. 이제 로그인을 다시 시도해주세요.');
-}
-async function testCloudConnection(){
- const box=$('loginError');
- const show=(msg,ok=false)=>{
-   if(box){box.style.display='block';box.style.borderColor=ok?'#244934':'#5a2828';box.style.background=ok?'#0e1812':'#1c1010';box.style.color=ok?'#99d4b1':'#f2a3a3';box.textContent=msg}
- };
- try{
-   if(!initSupabase()){show('Publishable key가 없거나 Supabase 라이브러리를 불러오지 못했습니다.\\n「연결키 다시 설정」을 눌러 키를 확인해주세요.');return}
-   const {error}=await supabaseClient.auth.getSession();
-   if(error){show('Supabase 연결 오류\\n'+(error.code||error.status||'unknown')+': '+error.message);return}
-   show('Supabase 프로젝트 연결은 정상입니다.\\n이제 이메일/비밀번호 로그인만 확인하면 됩니다.',true)
- }catch(e){show('연결 테스트 실패\\n'+(e?.message||String(e)))}
-}
 async function logout(){if(supabaseClient)await supabaseClient.auth.signOut();location.reload()}
 async function loadCloudData(){
  const [rr,pp,cc]=await Promise.all([
